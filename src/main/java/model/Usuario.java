@@ -6,15 +6,15 @@ public class Usuario {
 	private String email;
 	private String senha;
 	private String cpf;
-	private String numero;
+	private String telefone;
 	private Perfil perfil;
 	
-	public Usuario(String nome, String email, String senha, String cpf, String numero, Perfil perfil) {
+	public Usuario(String nome, String email, String senha, String cpf, String telefone, Perfil perfil) {
 		this.nome = nome;
 		this.email = email;
 		this.senha = senha;
 		this.cpf = cpf;
-		this.numero = numero;
+		this.telefone = telefone;
 		this.perfil = perfil;
 	}
 	
@@ -52,13 +52,13 @@ public class Usuario {
 		
 		this.cpf = cpf;
 	}
-	public String getNumero() {
+	public String getTelefone() {
 		
-		return numero;
+		return telefone;
 	}
-	public void setNumero(String numero) {
+	public void setTelefone(String telefone) {
 		
-		this.numero = numero;
+		this.telefone = telefone;
 	}
 	public Perfil getPerfil() {
 		

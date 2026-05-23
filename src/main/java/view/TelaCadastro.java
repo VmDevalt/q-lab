@@ -6,6 +6,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.MaskFormatter;
+
+import at.favre.lib.crypto.bcrypt.BCrypt;
+
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
@@ -30,7 +33,7 @@ public class TelaCadastro extends JFrame {
 	private JPanel contentPane;
 	private JTextField campoNome;
 	private JTextField campoEmail;
-	private JTextField campoTelefone;
+	private JFormattedTextField campoTelefone;
 	private JPasswordField campoSenha;
 	private JPasswordField campoConfirmarSenha;
 	private JFormattedTextField campoCpf;
@@ -70,6 +73,13 @@ public class TelaCadastro extends JFrame {
 		JButton btnCadastrar = new JButton("Cadastrar");
 		btnCadastrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				/*
+				 *LÓGICA DE CRIAR MÁSCARA PARA SENHA QUANDO CLICAR NO BOTÃO
+				if (Arrays.equals(campoSenha.getPassword(), campoConfirmarSenha.getPassword())){
+					char[] senha = campoSenha.getPassword(); 
+					String hashSenha = BCrypt.with(BCrypt.Version.VERSION_2A).hashToString(12, senha);
+				}
+				*/
 			}
 		});
 		btnCadastrar.setForeground(new Color(255, 255, 255));
@@ -102,12 +112,21 @@ public class TelaCadastro extends JFrame {
 		labelNome.setBounds(44, 183, 69, 24);
 		contentPane.add(labelNome);
 		
-		campoTelefone = new JTextField();
+		campoTelefone = new JFormattedTextField();
 		campoTelefone.setFont(new Font("Calibri", Font.BOLD, 11));
 		campoTelefone.setBounds(109, 368, 474, 33);
 		contentPane.add(campoTelefone);
 		campoTelefone.setColumns(10);
 		campoTelefone.setBorder(BorderFactory.createLineBorder(Color.black,2));
+		
+		MaskFormatter mascaraTelefone;
+		try{
+		    mascaraTelefone = new MaskFormatter("(##) #####-####");
+		    mascaraTelefone.setPlaceholderCharacter('_');
+		    mascaraTelefone.install(campoTelefone);
+		}catch (ParseException e){
+		    e.printStackTrace();
+		}
 
 		JLabel labelConfirmarSenha = new JLabel("Confirmar Senha");
 		labelConfirmarSenha.setFont(new Font("Calibri", Font.PLAIN, 18));
@@ -152,7 +171,6 @@ public class TelaCadastro extends JFrame {
 		
 		adicionarPlaceholder(campoEmail, "Digite seu email");
 		adicionarPlaceholder(campoNome, "Digite seu nome");
-		adicionarPlaceholder(campoTelefone, "Digite seu telefone");
 		
 		JLabel labelCpf = new JLabel("CPF");
 		labelCpf.setFont(new Font("Calibri", Font.PLAIN, 18));
