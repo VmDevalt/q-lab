@@ -79,12 +79,12 @@ public class TelaCadastro extends JFrame {
 		contentPane.add(btnCadastrar);
 		
 		campoNome = new JTextField();
-		campoNome.setFont(new Font("Tahoma", Font.BOLD, 11));
+		campoNome.setFont(new Font("Calibri", Font.BOLD, 11));
 		campoNome.setBounds(109, 178, 474, 33);
 		contentPane.add(campoNome);
 		campoNome.setColumns(10);
 		campoNome.setBorder(BorderFactory.createLineBorder(Color.black,2));
-
+		
 		campoEmail = new JTextField();
 		campoEmail.setFont(new Font("Calibri", Font.BOLD, 11));
 		campoEmail.setBounds(109, 307, 474, 33);
@@ -103,7 +103,7 @@ public class TelaCadastro extends JFrame {
 		contentPane.add(labelNome);
 		
 		campoTelefone = new JTextField();
-		campoTelefone.setFont(new Font("Tahoma", Font.BOLD, 11));
+		campoTelefone.setFont(new Font("Calibri", Font.BOLD, 11));
 		campoTelefone.setBounds(109, 368, 474, 33);
 		contentPane.add(campoTelefone);
 		campoTelefone.setColumns(10);
@@ -126,37 +126,41 @@ public class TelaCadastro extends JFrame {
 		contentPane.add(labelTelefone);
 		
 		JComboBox comboBox = new JComboBox();
-		comboBox.setFont(new Font("Tahoma", Font.BOLD, 13));
+		comboBox.setFont(new Font("Calibri", Font.BOLD, 13));
 		comboBox.setModel(new DefaultComboBoxModel(new String[] {"    Administrador", "    Professor", "    Técnico", "    Guardião"}));
 		comboBox.setBounds(277, 116, 141, 28);
 		contentPane.add(comboBox);
 
 		JLabel lblNewLabel_3 = new JLabel("Perfil");
-		lblNewLabel_3.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		lblNewLabel_3.setFont(new Font("Calibri", Font.PLAIN, 15));
 		lblNewLabel_3.setBounds(234, 121, 46, 14);
 		contentPane.add(lblNewLabel_3);
 
 		campoSenha = new JPasswordField();
-		campoSenha.setFont(new Font("Tahoma", Font.BOLD, 11));
+		campoSenha.setFont(new Font("Calibri", Font.BOLD, 11));
 		campoSenha.setBounds(109, 423, 167, 33);
 		contentPane.add(campoSenha);
 
 		campoSenha.setBorder(BorderFactory.createLineBorder(Color.black,2));
 
 		campoConfirmarSenha = new JPasswordField();
-		campoConfirmarSenha.setFont(new Font("Tahoma", Font.BOLD, 11));
+		campoConfirmarSenha.setFont(new Font("Calibri", Font.BOLD, 11));
 		campoConfirmarSenha.setBounds(409, 423, 174, 33);
 		contentPane.add(campoConfirmarSenha);
 
 		campoConfirmarSenha.setBorder(BorderFactory.createLineBorder(Color.black,2));
-
+		
+		adicionarPlaceholder(campoEmail, "Digite seu email");
+		adicionarPlaceholder(campoNome, "Digite seu nome");
+		adicionarPlaceholder(campoTelefone, "Digite seu telefone");
+		
 		JLabel labelCpf = new JLabel("CPF");
 		labelCpf.setFont(new Font("Calibri", Font.PLAIN, 18));
 		labelCpf.setBounds(44, 247, 58, 26);
 		contentPane.add(labelCpf);
 
 		campoCpf = new JFormattedTextField();
-		campoCpf.setFont(new Font("Tahoma", Font.BOLD, 11));
+		campoCpf.setFont(new Font("Calibri", Font.BOLD, 11));
 		campoCpf.setColumns(10);
 		campoCpf.setBounds(109, 243, 474, 33);
 		contentPane.add(campoCpf);
@@ -185,8 +189,8 @@ public class TelaCadastro extends JFrame {
 		campoCpf.setBorder(BorderFactory.createLineBorder(Color.black,2,true));
 
 		JLabel labelCadastro = new JLabel("Cadastro");
-		labelCadastro.setFont(new Font("Tahoma", Font.PLAIN, 50));
-		labelCadastro.setBounds(234, 22, 202, 44);
+		labelCadastro.setFont(new Font("Calibri", Font.PLAIN, 50));
+		labelCadastro.setBounds(234, 44, 202, 62);
 		contentPane.add(labelCadastro);
 		
 		JLabel labelIcone = new JLabel("");
@@ -194,6 +198,35 @@ public class TelaCadastro extends JFrame {
 		labelIcone.setBounds(44, 11, 69, 80);
 		contentPane.add(labelIcone);
 		}
+	
+	public void adicionarPlaceholder(JTextField campo, String textoPlaceholder) {
+		campo.setText(textoPlaceholder);
+		campo.setForeground(Color.GRAY);
+		
+		campo.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				if (campo.getText().equals(textoPlaceholder)) {
+					campo.setForeground(Color.BLACK);
+					campo.setText("");
+				}
+			}
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+				if (campo.getText().equals("")) {
+					campo.setForeground(Color.GRAY);
+					campo.setText(textoPlaceholder);
+				}
+			}
+		});
+		
+		
+		
+		
+		
+		
+		
 	}
-
+}
 
