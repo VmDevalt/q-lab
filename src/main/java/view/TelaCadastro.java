@@ -68,6 +68,7 @@ public class TelaCadastro extends JFrame {
 		setResizable(false);
 
 		JButton btnCadastrar = new JButton("Cadastrar");
+		btnCadastrar.setFont(new Font("Calibri", Font.PLAIN, 13));
 		btnCadastrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
