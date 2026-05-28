@@ -8,7 +8,7 @@ import model.Usuario;
 import util.ConnectionFactory;
 
 public class UsuarioDao {
-	public void cadastrarUsuario(Usuario usuario) throws SQLException {
+	public boolean cadastrarUsuario(Usuario usuario) throws SQLException {
 		String sql = "insert into usuario (nome,email,cpf,telefone,senha,perfil) values(?,?,?,?,?,?)";
 		Connection conn = ConnectionFactory.getConnection();
 		PreparedStatement ps = conn.prepareStatement(sql);
@@ -24,5 +24,6 @@ public class UsuarioDao {
 		
 		ConnectionFactory.closeConnection(conn);
 		ps.close();
+		return true;
 	}
 }
