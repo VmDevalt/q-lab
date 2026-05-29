@@ -2,10 +2,12 @@ package view;
 
 import java.awt.EventQueue;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.MaskFormatter;
+
+import at.favre.lib.crypto.bcrypt.BCrypt;
+
 
 import util.ImageUtil;
 
@@ -19,14 +21,11 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.*;
 import java.text.ParseException;
-import javax.swing.JPasswordField;
 import java.awt.Color;
-import javax.swing.ImageIcon;
-import javax.swing.JFormattedTextField;
-import javax.swing.SwingUtilities;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
 
 public class TelaCadastro extends JFrame {
 
@@ -34,10 +33,11 @@ public class TelaCadastro extends JFrame {
 	private JPanel contentPane;
 	private JTextField campoNome;
 	private JTextField campoEmail;
-	private JTextField campoTelefone;
+	private JFormattedTextField campoTelefone;
 	private JPasswordField campoSenha;
 	private JPasswordField campoConfirmarSenha;
 	private JFormattedTextField campoCpf;
+	private JComboBox comboBox;
 
 	/**
 	 * Launch the application.
@@ -75,6 +75,59 @@ public class TelaCadastro extends JFrame {
 		btnCadastrar.setFont(new Font("Calibri", Font.PLAIN, 13));
 		btnCadastrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String nome = campoNome.getText().trim();
+				String email = campoEmail.getText().trim();
+				String cpf = campoCpf.getText();
+				String telefone = campoTelefone.getText();
+				char[] senha = campoSenha.getPassword();
+				char[] confirmarSenha = campoConfirmarSenha.getPassword();
+
+				if (nome.isEmpty() || nome.equals("Digite seu nome")) {
+					JOptionPane.showMessageDialog(null, "O campo Nome não pode estar vazio!");
+					return;
+				}
+
+				if (email.isEmpty() || email.equals("Digite seu email")) {
+					JOptionPane.showMessageDialog(null, "O campo Email não pode estar vazio!");
+					return;
+				}
+				if (!email.contains("@") || !email.contains(".")) {
+					JOptionPane.showMessageDialog(null, "Email inválido! Use o formato: usuario@email.com");
+					return;
+				}
+
+				if (cpf.contains("_") || cpf.replace(".", "").replace("-", "").isBlank()) {
+					JOptionPane.showMessageDialog(null, "CPF inválido ou incompleto!");
+					return;
+				}
+
+				if (telefone.contains("_") || telefone.replace("(", "").replace(")", "").replace(" ", "").replace("-", "").isBlank()) {
+					JOptionPane.showMessageDialog(null, "Telefone inválido ou incompleto!");
+					return;
+				}
+
+				if (senha.length == 0) {
+					JOptionPane.showMessageDialog(null, "O campo Senha não pode estar vazio!");
+					return;
+				}
+				if (senha.length < 6) {
+					JOptionPane.showMessageDialog(null, "A senha deve ter pelo menos 6 caracteres!");
+					return;
+				}
+				if (!Arrays.equals(senha, confirmarSenha)) {
+					JOptionPane.showMessageDialog(null, "As senhas não coincidem!");
+					return;
+				}
+
+				if (comboBox.getSelectedIndex() == 0) {
+					JOptionPane.showMessageDialog(null, "Selecione um perfil!");
+					return;
+				}
+
+				String hashSenha = BCrypt.with(BCrypt.Version.VERSION_2A).hashToString(12, senha);
+				Arrays.fill(senha, '\0');
+				Arrays.fill(confirmarSenha, '\0');
+				JOptionPane.showMessageDialog(null, "Cadastro realizado com sucesso!");
 			}
 		});
 		btnCadastrar.setForeground(new Color(255, 255, 255));
@@ -107,12 +160,21 @@ public class TelaCadastro extends JFrame {
 		labelNome.setBounds(44, 183, 69, 24);
 		contentPane.add(labelNome);
 		
-		campoTelefone = new JTextField();
+		campoTelefone = new JFormattedTextField();
 		campoTelefone.setFont(new Font("Calibri", Font.BOLD, 11));
 		campoTelefone.setBounds(109, 368, 474, 33);
 		contentPane.add(campoTelefone);
 		campoTelefone.setColumns(10);
 		campoTelefone.setBorder(BorderFactory.createLineBorder(Color.black,2));
+		
+		MaskFormatter mascaraTelefone;
+		try{
+		    mascaraTelefone = new MaskFormatter("(##) #####-####");
+		    mascaraTelefone.setPlaceholderCharacter('_');
+		    mascaraTelefone.install(campoTelefone);
+		}catch (ParseException e){
+		    e.printStackTrace();
+		}
 
 		JLabel labelConfirmarSenha = new JLabel("Confirmar Senha");
 		labelConfirmarSenha.setFont(new Font("Calibri", Font.PLAIN, 18));
@@ -130,9 +192,9 @@ public class TelaCadastro extends JFrame {
 		labelTelefone.setBounds(35, 373, 78, 24);
 		contentPane.add(labelTelefone);
 		
-		JComboBox comboBox = new JComboBox();
+		comboBox = new JComboBox();
 		comboBox.setFont(new Font("Calibri", Font.BOLD, 13));
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"    Administrador", "    Professor", "    Técnico", "    Guardião"}));
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"    Selecione...", "    Administrador", "    Professor", "    Técnico", "    Guardião"}));
 		comboBox.setBounds(277, 116, 141, 28);
 		contentPane.add(comboBox);
 
@@ -157,7 +219,6 @@ public class TelaCadastro extends JFrame {
 		
 		adicionarPlaceholder(campoEmail, "Digite seu email");
 		adicionarPlaceholder(campoNome, "Digite seu nome");
-		adicionarPlaceholder(campoTelefone, "Digite seu telefone");
 		
 		JLabel labelCpf = new JLabel("CPF");
 		labelCpf.setFont(new Font("Calibri", Font.PLAIN, 18));
