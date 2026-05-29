@@ -6,6 +6,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.MaskFormatter;
+
+import util.ImageUtil;
+
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
@@ -13,6 +16,7 @@ import javax.swing.JComboBox;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.*;
 import java.text.ParseException;
 import javax.swing.JPasswordField;
@@ -55,7 +59,7 @@ public class TelaCadastro extends JFrame {
 	 * Create the frame.
 	 */
 	public TelaCadastro() {
-		setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\heito\\OneDrive\\Imagens\\logo - Copia.PNG"));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/logo_qlab_pequena_branca.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 660, 603);
 		contentPane = new JPanel();
@@ -195,9 +199,11 @@ public class TelaCadastro extends JFrame {
 		contentPane.add(labelCadastro);
 		
 		JLabel labelIcone = new JLabel("");
-		labelIcone.setIcon(new ImageIcon("C:\\Users\\heito\\OneDrive\\Imagens\\logo - Copia.PNG"));
-		labelIcone.setBounds(44, 11, 69, 80);
+		ImageIcon imagemLogoQlab = new ImageIcon(getClass().getResource("/images/logo_qlab_media.png"));
+		labelIcone.setIcon(ImageUtil.redimensionarImagem(imagemLogoQlab, 166, 70));
+		labelIcone.setBounds(21, 28, 213, 107);
 		contentPane.add(labelIcone);
+
 		}
 	
 	public void adicionarPlaceholder(JTextField campo, String textoPlaceholder) {
