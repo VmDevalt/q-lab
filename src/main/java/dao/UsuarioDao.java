@@ -9,7 +9,7 @@ import util.ConnectionFactory;
 
 public class UsuarioDao {
 	public boolean cadastrarUsuario(Usuario usuario) throws SQLException {
-		String sql = "insert into usuario (nome,email,cpf,telefone,senha,perfil) values(?,?,?,?,?,?)";
+		String sql = "insert into usuarios (nome,email,cpf,telefone,senha,perfil) values(?,?,?,?,?,?)";
 		Connection conn = ConnectionFactory.getConnection();
 		PreparedStatement ps = conn.prepareStatement(sql);
 		
