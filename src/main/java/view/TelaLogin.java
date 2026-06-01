@@ -9,6 +9,8 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.MaskFormatter;
+
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -19,13 +21,19 @@ import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.SwingUtilities;
+import javax.swing.JFormattedTextField;
 
 public class TelaLogin extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JPasswordField passwordField;
-	private JTextField textField;
+	private JFormattedTextField textField;
 
 	/**
 	 * Launch the application.
@@ -83,11 +91,23 @@ public class TelaLogin extends JFrame {
 	    passwordField.setBounds(444, 277, 207, 26);
 	    painelPrincipal.add(passwordField);
 	    
-	    textField = new JTextField();
+	    textField = new JFormattedTextField();
 	    textField.setForeground(new Color(0, 0, 0));
 	    textField.setBounds(444, 199, 207, 26);
 	    painelPrincipal.add(textField);
 	    textField.setColumns(10);
+	    textField.addFocusListener(new FocusAdapter() {
+	        @Override
+	        public void focusGained(FocusEvent e) {
+	            SwingUtilities.invokeLater(() -> textField.setCaretPosition(0));
+	        }
+	    });
+	    textField.addMouseListener(new MouseAdapter() {
+	        @Override
+	        public void mouseReleased(MouseEvent e) {
+	            textField.setCaretPosition(0);
+	        }
+	    });
 	    
 	    JLabel labelCpf = new JLabel("CPF");
 	    labelCpf.setFont(new Font("Calibri", Font.PLAIN, 21));
@@ -144,7 +164,14 @@ public class TelaLogin extends JFrame {
 	    labelCadastrar.setFont(new Font("Calibri", Font.PLAIN, 21));
 	    labelCadastrar.setBounds(381, 426, 170, 25);
 	    painelPrincipal.add(labelCadastrar);
-
 	    
+	    MaskFormatter mascaraCpf;
+	    		try { 
+	    			mascaraCpf = new MaskFormatter("###.###.###-##"); 
+	    			mascaraCpf.setPlaceholderCharacter('_'); 
+	    			mascaraCpf.install(textField); 
+	    		} catch (Exception e) { 
+	    			e.printStackTrace(); 
+	    		}
 	}
 }
