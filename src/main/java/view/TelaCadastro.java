@@ -26,6 +26,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
+import controller.CadastroController;
+import model.Perfil;
 
 public class TelaCadastro extends JFrame {
 
@@ -38,6 +40,7 @@ public class TelaCadastro extends JFrame {
 	private JPasswordField campoConfirmarSenha;
 	private JFormattedTextField campoCpf;
 	private JComboBox comboBox;
+	private JCheckBox checkAdministrador;
 
 	/**
 	 * Launch the application.
@@ -127,7 +130,19 @@ public class TelaCadastro extends JFrame {
 				String hashSenha = BCrypt.with(BCrypt.Version.VERSION_2A).hashToString(12, senha);
 				Arrays.fill(senha, '\0');
 				Arrays.fill(confirmarSenha, '\0');
-				JOptionPane.showMessageDialog(null, "Cadastro realizado com sucesso!");
+
+				String[] perfisValores = {"ADMINISTRADOR", "PROFESSOR", "TECNICO", "GUARDIAO"};
+				Perfil perfilSelecionado = Perfil.valueOf(perfisValores[comboBox.getSelectedIndex() - 1]);
+				boolean administrador = checkAdministrador.isSelected();
+
+				CadastroController controller = new CadastroController();
+				boolean sucesso = controller.CadastrarUsuario(nome, email, cpf, telefone, hashSenha, perfilSelecionado, administrador);
+
+				if (sucesso) {
+					JOptionPane.showMessageDialog(null, "Cadastro realizado com sucesso!");
+				} else {
+					JOptionPane.showMessageDialog(null, "Erro ao realizar cadastro!", "Erro", JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		btnCadastrar.setForeground(new Color(255, 255, 255));
@@ -202,6 +217,12 @@ public class TelaCadastro extends JFrame {
 		lblNewLabel_3.setFont(new Font("Calibri", Font.PLAIN, 15));
 		lblNewLabel_3.setBounds(234, 121, 46, 14);
 		contentPane.add(lblNewLabel_3);
+
+		checkAdministrador = new JCheckBox("Administrador");
+		checkAdministrador.setFont(new Font("Calibri", Font.PLAIN, 14));
+		checkAdministrador.setBackground(Color.WHITE);
+		checkAdministrador.setBounds(430, 116, 160, 28);
+		contentPane.add(checkAdministrador);
 
 		campoSenha = new JPasswordField();
 		campoSenha.setFont(new Font("Calibri", Font.BOLD, 11));
