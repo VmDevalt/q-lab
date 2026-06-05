@@ -41,7 +41,7 @@ public class TelaSelecionarLab extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(
 				getClass().getResource("/images/logo_qlab_pequena_branca.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 980, 580);
+		setBounds(100, 100, 1280, 720);
 		setTitle("QLAB - Sistema de Gestão de Laboratórios");
 		setResizable(false);
 
@@ -52,7 +52,7 @@ public class TelaSelecionarLab extends JFrame {
 
 		JPanel painelLateral = new JPanel();
 		painelLateral.setLayout(null);
-		painelLateral.setBounds(0, 0, 190, 560);
+		painelLateral.setBounds(0, 0, 190, 682);
 		painelLateral.setBackground(new Color(27, 94, 32));
 		contentPane.add(painelLateral);
 
@@ -129,14 +129,14 @@ public class TelaSelecionarLab extends JFrame {
 		JScrollPane scrollNav = new JScrollPane(painelNav,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollNav.setBounds(0, 78, 190, 427); 
-		scrollNav.setBorder(null);            
-		scrollNav.getViewport().setBackground(new Color(27, 94, 32)); 
+		scrollNav.setBounds(0, 78, 190, 560);
+		scrollNav.setBorder(null);
+		scrollNav.getViewport().setBackground(new Color(27, 94, 32));
 		painelLateral.add(scrollNav);
 
 		JButton btnSair = criarBotaoMenu("Sair");
 		btnSair.setBackground(new Color(183, 28, 28));
-		btnSair.setBounds(5, 510, 180, 32);
+		btnSair.setBounds(5, 640, 180, 32);
 		btnSair.addActionListener(e -> {
 			dispose();                       
 			new TelaLogin().setVisible(true); 
@@ -145,7 +145,7 @@ public class TelaSelecionarLab extends JFrame {
 
 		cardLayout = new CardLayout();
 		painelConteudo = new JPanel(cardLayout);
-		painelConteudo.setBounds(193, 5, 775, 550);
+		painelConteudo.setBounds(193, 5, 1062, 672);
 		painelConteudo.setBackground(Color.WHITE);
 		contentPane.add(painelConteudo);
 
@@ -179,11 +179,11 @@ public class TelaSelecionarLab extends JFrame {
 
 		JLabel titulo = new JLabel("Selecionar Laboratório", SwingConstants.CENTER);
 		titulo.setFont(new Font("Calibri", Font.PLAIN, 32));
-		titulo.setBounds(0, 25, 775, 42);
+		titulo.setBounds(0, 25, 1062, 42);
 		painel.add(titulo);
 
-		int[] colX = {137, 312, 487};
-		int[] rowY  = {143, 323};
+		int[] colX = {281, 456, 631};
+		int[] rowY  = {221, 401};
 
 		for (int i = 0; i < labs.length; i++) {
 			int col = i % 3;
@@ -224,19 +224,19 @@ public class TelaSelecionarLab extends JFrame {
 
 		JLabel titulo = new JLabel(lab[0] + " – " + lab[1], SwingConstants.CENTER);
 		titulo.setFont(new Font("Calibri", Font.PLAIN, 32));
-		titulo.setBounds(0, 25, 775, 42);
+		titulo.setBounds(0, 25, 1062, 42);
 		painel.add(titulo);
 
 		JLabel andar = new JLabel(lab[2], SwingConstants.CENTER);
 		andar.setFont(new Font("Calibri", Font.ITALIC, 16));
 		andar.setForeground(Color.GRAY);
-		andar.setBounds(0, 75, 775, 25);
+		andar.setBounds(0, 75, 1062, 25);
 		painel.add(andar);
 
 		JLabel placeholder = new JLabel("Detalhes do laboratório em desenvolvimento", SwingConstants.CENTER);
 		placeholder.setFont(new Font("Calibri", Font.ITALIC, 14));
 		placeholder.setForeground(new Color(190, 190, 190));
-		placeholder.setBounds(0, 260, 775, 25);
+		placeholder.setBounds(0, 330, 1062, 25);
 		painel.add(placeholder);
 
 		return painel;
