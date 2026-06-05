@@ -49,13 +49,14 @@ public class TelaLogin extends JFrame {
 	public TelaLogin() {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/logo_qlab_pequena_branca.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1000, 600);
+		setSize(1280, 720);
+		setLocationRelativeTo(null); 
 		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(null);
 		contentPane.setBackground(Color.gray);
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane); // ← logo após criar o painel
 		this.setTitle("QLAB - Login");
-		setContentPane(contentPane);
 		setResizable(false);
 
 		

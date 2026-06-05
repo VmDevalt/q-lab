@@ -26,8 +26,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
-import controller.CadastroController;
-import model.Perfil;
 
 public class TelaCadastro extends JFrame {
 
@@ -40,7 +38,6 @@ public class TelaCadastro extends JFrame {
 	private JPasswordField campoConfirmarSenha;
 	private JFormattedTextField campoCpf;
 	private JComboBox comboBox;
-	private JCheckBox checkAdministrador;
 
 	/**
 	 * Launch the application.
@@ -51,6 +48,7 @@ public class TelaCadastro extends JFrame {
 				try {
 					TelaCadastro frame = new TelaCadastro();
 					frame.setVisible(true);
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -64,7 +62,8 @@ public class TelaCadastro extends JFrame {
 	public TelaCadastro() {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/logo_qlab_pequena_branca.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 660, 603);
+		setSize(1280, 720);
+		setLocationRelativeTo(null); 
 		contentPane = new JPanel();
 		contentPane.setBackground(Color.WHITE);
 		contentPane.setForeground(Color.GRAY);
@@ -130,54 +129,42 @@ public class TelaCadastro extends JFrame {
 				String hashSenha = BCrypt.with(BCrypt.Version.VERSION_2A).hashToString(12, senha);
 				Arrays.fill(senha, '\0');
 				Arrays.fill(confirmarSenha, '\0');
-
-				String[] perfisValores = {"ADMINISTRADOR", "PROFESSOR", "TECNICO", "GUARDIAO"};
-				Perfil perfilSelecionado = Perfil.valueOf(perfisValores[comboBox.getSelectedIndex() - 1]);
-				boolean administrador = checkAdministrador.isSelected();
-
-				CadastroController controller = new CadastroController();
-				boolean sucesso = controller.CadastrarUsuario(nome, email, cpf, telefone, hashSenha, perfilSelecionado, administrador);
-
-				if (sucesso) {
-					JOptionPane.showMessageDialog(null, "Cadastro realizado com sucesso!");
-				} else {
-					JOptionPane.showMessageDialog(null, "Erro ao realizar cadastro!", "Erro", JOptionPane.ERROR_MESSAGE);
-				}
+				JOptionPane.showMessageDialog(null, "Cadastro realizado com sucesso!");
 			}
 		});
 		btnCadastrar.setForeground(new Color(255, 255, 255));
 		btnCadastrar.setBackground(new Color(34, 139, 34));
-		btnCadastrar.setBounds(266, 490, 152, 50);
+		btnCadastrar.setBounds(566, 510, 152, 50);
 		btnCadastrar.setFocusable(false);
 		contentPane.add(btnCadastrar);
 		
 		campoNome = new JTextField();
 		campoNome.setFont(new Font("Calibri", Font.BOLD, 11));
-		campoNome.setBounds(109, 178, 474, 33);
+		campoNome.setBounds(400, 180, 474, 33);
 		contentPane.add(campoNome);
 		campoNome.setColumns(10);
 		campoNome.setBorder(BorderFactory.createLineBorder(Color.black,2));
 		
 		campoEmail = new JTextField();
 		campoEmail.setFont(new Font("Calibri", Font.BOLD, 11));
-		campoEmail.setBounds(109, 307, 474, 33);
+		campoEmail.setBounds(400, 310, 474, 33);
 		contentPane.add(campoEmail);
 		campoEmail.setColumns(10);
 		campoEmail.setBorder(BorderFactory.createLineBorder(Color.black,2));
 
 		JLabel labelSenha = new JLabel("Senha");
 		labelSenha.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelSenha.setBounds(44, 432, 58, 17);
+		labelSenha.setBounds(328, 461, 58, 21);
 		contentPane.add(labelSenha);
 		
 		JLabel labelNome = new JLabel("Nome");
 		labelNome.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelNome.setBounds(44, 183, 69, 24);
+		labelNome.setBounds(328, 183, 69, 24);
 		contentPane.add(labelNome);
 		
 		campoTelefone = new JFormattedTextField();
 		campoTelefone.setFont(new Font("Calibri", Font.BOLD, 11));
-		campoTelefone.setBounds(109, 368, 474, 33);
+		campoTelefone.setBounds(400, 380, 474, 33);
 		contentPane.add(campoTelefone);
 		campoTelefone.setColumns(10);
 		campoTelefone.setBorder(BorderFactory.createLineBorder(Color.black,2));
@@ -193,47 +180,41 @@ public class TelaCadastro extends JFrame {
 
 		JLabel labelConfirmarSenha = new JLabel("Confirmar Senha");
 		labelConfirmarSenha.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelConfirmarSenha.setBounds(277, 423, 141, 34);
+		labelConfirmarSenha.setBounds(573, 454, 141, 34);
 		contentPane.add(labelConfirmarSenha);
 
 		JLabel labelEmail = new JLabel("Email");
 		labelEmail.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelEmail.setBounds(44, 314, 58, 21);
+		labelEmail.setBounds(328, 315, 58, 21);
 
 		contentPane.add(labelEmail);
 
 		JLabel labelTelefone = new JLabel("Telefone");
 		labelTelefone.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelTelefone.setBounds(35, 373, 78, 24);
+		labelTelefone.setBounds(328, 383, 78, 24);
 		contentPane.add(labelTelefone);
 		
 		comboBox = new JComboBox();
 		comboBox.setFont(new Font("Calibri", Font.BOLD, 13));
 		comboBox.setModel(new DefaultComboBoxModel(new String[] {"    Selecione...", "    Administrador", "    Professor", "    Técnico", "    Guardião"}));
-		comboBox.setBounds(277, 116, 141, 28);
+		comboBox.setBounds(566, 114, 141, 28);
 		contentPane.add(comboBox);
 
 		JLabel lblNewLabel_3 = new JLabel("Perfil");
 		lblNewLabel_3.setFont(new Font("Calibri", Font.PLAIN, 15));
-		lblNewLabel_3.setBounds(234, 121, 46, 14);
+		lblNewLabel_3.setBounds(521, 118, 53, 21);
 		contentPane.add(lblNewLabel_3);
-
-		checkAdministrador = new JCheckBox("Administrador");
-		checkAdministrador.setFont(new Font("Calibri", Font.PLAIN, 14));
-		checkAdministrador.setBackground(Color.WHITE);
-		checkAdministrador.setBounds(430, 116, 160, 28);
-		contentPane.add(checkAdministrador);
 
 		campoSenha = new JPasswordField();
 		campoSenha.setFont(new Font("Calibri", Font.BOLD, 11));
-		campoSenha.setBounds(109, 423, 167, 33);
+		campoSenha.setBounds(400, 456, 167, 33);
 		contentPane.add(campoSenha);
 
 		campoSenha.setBorder(BorderFactory.createLineBorder(Color.black,2));
 
 		campoConfirmarSenha = new JPasswordField();
 		campoConfirmarSenha.setFont(new Font("Calibri", Font.BOLD, 11));
-		campoConfirmarSenha.setBounds(409, 423, 174, 33);
+		campoConfirmarSenha.setBounds(700, 456, 174, 33);
 		contentPane.add(campoConfirmarSenha);
 
 		campoConfirmarSenha.setBorder(BorderFactory.createLineBorder(Color.black,2));
@@ -243,13 +224,13 @@ public class TelaCadastro extends JFrame {
 		
 		JLabel labelCpf = new JLabel("CPF");
 		labelCpf.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelCpf.setBounds(44, 247, 58, 26);
+		labelCpf.setBounds(328, 247, 58, 26);
 		contentPane.add(labelCpf);
 
 		campoCpf = new JFormattedTextField();
 		campoCpf.setFont(new Font("Calibri", Font.BOLD, 11));
 		campoCpf.setColumns(10);
-		campoCpf.setBounds(109, 243, 474, 33);
+		campoCpf.setBounds(400, 245, 474, 33);
 		contentPane.add(campoCpf);
 		campoCpf.addFocusListener(new FocusAdapter() {
 			@Override
@@ -277,13 +258,13 @@ public class TelaCadastro extends JFrame {
 
 		JLabel labelCadastro = new JLabel("Cadastro");
 		labelCadastro.setFont(new Font("Calibri", Font.PLAIN, 50));
-		labelCadastro.setBounds(234, 44, 202, 62);
+		labelCadastro.setBounds(521, 41, 202, 62);
 		contentPane.add(labelCadastro);
 		
 		JLabel labelIcone = new JLabel("");
 		ImageIcon imagemLogoQlab = new ImageIcon(getClass().getResource("/images/logo_qlab_media.png"));
 		labelIcone.setIcon(ImageUtil.redimensionarImagem(imagemLogoQlab, 166, 70));
-		labelIcone.setBounds(21, 28, 213, 107);
+		labelIcone.setBounds(67, 21, 213, 107);
 		contentPane.add(labelIcone);
 
 		}
