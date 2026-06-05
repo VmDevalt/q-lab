@@ -69,7 +69,8 @@ public class TelaLogin extends JFrame {
 	    linha.setBounds(616, 89, 2, 460);
 	    painelPrincipal.setLayout(null);
 	    
-	    JButton btnMostrarSenha = new JButton("button");
+	    JButton btnMostrarSenha = new JButton("");
+	    btnMostrarSenha.setIcon(new ImageIcon("C:\\Users\\Magalu739\\q-lab\\src\\main\\resources\\images\\olhoClos.png"));
 	    btnMostrarSenha.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e) {
 	    		if (senhaVisivel == true) {
@@ -81,7 +82,7 @@ public class TelaLogin extends JFrame {
 	    		}
 	    	}
 	    });
-	    btnMostrarSenha.setBounds(900, 312, 23, 23);
+	    btnMostrarSenha.setBounds(896, 310, 27, 26);
 	    painelPrincipal.add(btnMostrarSenha);
 	    painelPrincipal.add(linha);
 	    linha.setForeground(Color.black);
