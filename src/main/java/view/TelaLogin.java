@@ -26,7 +26,7 @@ public class TelaLogin extends JFrame {
 	private JPanel contentPane;
 	private JPasswordField passwordField;
 	private JTextField textField;
-
+	private boolean senhaVisivel = false;
 	/**
 	 * Launch the application.
 	 */
@@ -61,13 +61,29 @@ public class TelaLogin extends JFrame {
 
 		
 	    JPanel painelPrincipal = new JPanel();
-	    painelPrincipal.setBounds(0, 0, 1286, 681);
+	    painelPrincipal.setBounds(0, -30, 1286, 711);
 	    contentPane.add(painelPrincipal);
 	    painelPrincipal.setBackground(Color.white);
 	    
 	    JSeparator linha = new JSeparator(SwingConstants.VERTICAL);
 	    linha.setBounds(616, 89, 2, 460);
 	    painelPrincipal.setLayout(null);
+	    
+	    JButton btnMostrarSenha = new JButton("");
+	    btnMostrarSenha.setIcon(new ImageIcon("C:\\Users\\Magalu739\\q-lab\\src\\main\\resources\\images\\olhoClos.png"));
+	    btnMostrarSenha.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		if (senhaVisivel == true) {
+	    			passwordField.setEchoChar('*');
+	    			senhaVisivel = false;
+	    		} else {
+	    			passwordField.setEchoChar('\0');
+	    			senhaVisivel = true;
+	    		}
+	    	}
+	    });
+	    btnMostrarSenha.setBounds(896, 310, 27, 26);
+	    painelPrincipal.add(btnMostrarSenha);
 	    painelPrincipal.add(linha);
 	    linha.setForeground(Color.black);
 	    
