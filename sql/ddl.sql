@@ -6,6 +6,7 @@ CREATE TABLE usuarios(
     telefone VARCHAR(15),
     senha VARCHAR(60),
     perfil ENUM ('ADMINISTRADOR', 'PROFESSOR', 'TECNICO', 'GUARDIAO'),
+    administrador BOOLEAN DEFAULT FALSE,
     CHECK (email LIKE ("%@%")),
     CHECK (CHAR_LENGTH(telefone) = 15));
 
