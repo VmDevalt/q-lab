@@ -55,18 +55,18 @@ public class TelaLogin extends JFrame {
 		contentPane.setLayout(null);
 		contentPane.setBackground(Color.gray);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane); // ← logo após criar o painel
+		setContentPane(contentPane); 
 		this.setTitle("QLAB - Login");
 		setResizable(false);
 
 		
 	    JPanel painelPrincipal = new JPanel();
-	    painelPrincipal.setBounds(150, 33, 700, 500);
+	    painelPrincipal.setBounds(0, 0, 1286, 681);
 	    contentPane.add(painelPrincipal);
 	    painelPrincipal.setBackground(Color.white);
 	    
 	    JSeparator linha = new JSeparator(SwingConstants.VERTICAL);
-	    linha.setBounds(369, 30, 2, 460);
+	    linha.setBounds(616, 89, 2, 460);
 	    painelPrincipal.setLayout(null);
 	    painelPrincipal.add(linha);
 	    linha.setForeground(Color.black);
@@ -77,32 +77,36 @@ public class TelaLogin extends JFrame {
 	    JLabel labelCadastro = new JLabel("Login");
 	    labelCadastro.setHorizontalAlignment(SwingConstants.CENTER);
 	    labelCadastro.setFont(new Font("Calibri", Font.PLAIN, 50));
-	    labelCadastro.setBounds(397, 53, 239, 70);
+	    labelCadastro.setBounds(660, 114, 239, 70);
 	    painelPrincipal.add(labelCadastro);
 	    
 	    passwordField = new JPasswordField();
-	    passwordField.setBounds(444, 277, 207, 26);
+	    passwordField.setBounds(716, 310, 207, 26);
 	    painelPrincipal.add(passwordField);
 	    
 	    textField = new JTextField();
 	    textField.setForeground(new Color(0, 0, 0));
-	    textField.setBounds(444, 199, 207, 26);
+	    textField.setBounds(716, 229, 207, 26);
 	    painelPrincipal.add(textField);
 	    textField.setColumns(10);
 	    
 	    JLabel labelCpf = new JLabel("CPF");
 	    labelCpf.setFont(new Font("Calibri", Font.PLAIN, 21));
-	    labelCpf.setBounds(381, 200, 124, 25);
+	    labelCpf.setBounds(628, 231, 124, 25);
 	    painelPrincipal.add(labelCpf);
 	    
 	    JLabel labelSenha = new JLabel("Senha");
 	    labelSenha.setFont(new Font("Calibri", Font.PLAIN, 21));
-	    labelSenha.setBounds(381, 278, 124, 25);
+	    labelSenha.setBounds(628, 312, 124, 25);
 	    painelPrincipal.add(labelSenha);
 	    
 	    JButton btnEntrar = new JButton("Entrar");
+	    btnEntrar.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    	}
+	    });
 	    btnEntrar.setFont(new Font("Calibri", Font.PLAIN, 14));
-	    btnEntrar.setBounds(396, 333, 124, 26);
+	    btnEntrar.setBounds(628, 464, 124, 26);
 	    btnEntrar.setForeground(new Color(255, 255, 255));
 	    btnEntrar.setBackground(new Color(34, 139, 34));
 	    painelPrincipal.add(btnEntrar);
@@ -112,7 +116,7 @@ public class TelaLogin extends JFrame {
 	    ImageIcon imagemLogoQlab = new ImageIcon(getClass().getResource("/images/logo_qlab_media.png"));
 	    Image imagemLogoRedimensionada = imagemLogoQlab.getImage().getScaledInstance(300, 135, Image.SCALE_SMOOTH);;
 	    labelLogoQlab.setIcon(new ImageIcon(imagemLogoRedimensionada));
-	    labelLogoQlab.setBounds(10, 30, 349, 119);
+	    labelLogoQlab.setBounds(221, 41, 349, 119);
 	    painelPrincipal.add(labelLogoQlab);
 	    
 	    JLabel labelImagemPredio = new JLabel("");
@@ -120,7 +124,7 @@ public class TelaLogin extends JFrame {
 	    ImageIcon imagemOriginal = new ImageIcon(getClass().getResource("/images/predio_ifpe.png"));
 	    Image imagemRedimensionada = imagemOriginal.getImage().getScaledInstance(350, 400, Image.SCALE_SMOOTH);
 	    labelImagemPredio.setIcon(new ImageIcon(imagemRedimensionada));
-	    labelImagemPredio.setBounds(10, 98, 349, 392);
+	    labelImagemPredio.setBounds(269, 157, 349, 392);
 	    painelPrincipal.add(labelImagemPredio);
 	    
 	    JButton btnEsqueciSenha = new JButton("Esqueci a senha");
@@ -129,22 +133,10 @@ public class TelaLogin extends JFrame {
 	    	}
 	    });
 	    btnEsqueciSenha.setFont(new Font("Calibri", Font.PLAIN, 14));
-	    btnEsqueciSenha.setBounds(530, 333, 131, 26);
+	    btnEsqueciSenha.setBounds(792, 464, 131, 26);
 	    btnEsqueciSenha.setForeground(new Color(255, 255, 255));
 	    btnEsqueciSenha.setBackground(new Color(34, 139, 34));
 	    painelPrincipal.add(btnEsqueciSenha);
-	    
-	    JButton btnCadastrar = new JButton("Cadastrar");
-	    btnCadastrar.setFont(new Font("Calibri", Font.PLAIN, 15));
-	    btnCadastrar.setBounds(535, 426, 126, 26);
-	    btnCadastrar.setForeground(new Color(255, 255, 255));
-	    btnCadastrar.setBackground(new Color(34, 139, 34));
-	    painelPrincipal.add(btnCadastrar);
-	    
-	    JLabel labelCadastrar = new JLabel("Cadastre-se aqui:");
-	    labelCadastrar.setFont(new Font("Calibri", Font.PLAIN, 21));
-	    labelCadastrar.setBounds(381, 426, 170, 25);
-	    painelPrincipal.add(labelCadastrar);
 
 	    
 	}
