@@ -8,14 +8,16 @@ public class Usuario {
 	private String cpf;
 	private String telefone;
 	private Perfil perfil;
-	
-	public Usuario(String nome, String email, String senha, String cpf, String telefone, Perfil perfil) {
+	private boolean administrador;
+
+	public Usuario(String nome, String email, String senha, String cpf, String telefone, Perfil perfil, boolean administrador) {
 		this.nome = nome;
 		this.email = email;
 		this.senha = senha;
 		this.cpf = cpf;
 		this.telefone = telefone;
 		this.perfil = perfil;
+		this.administrador = administrador;
 	}
 	
 	public String getNome() {
@@ -61,12 +63,21 @@ public class Usuario {
 		this.telefone = telefone;
 	}
 	public Perfil getPerfil() {
-		
+
 		return perfil;
 	}
 	public void setPerfil (Perfil perfil) {
-		
+
 		this.perfil = perfil;
 	}
-	
+
+	public boolean isAdministrador() {
+
+		return administrador;
+	}
+	public void setAdministrador(boolean administrador) {
+
+		this.administrador = administrador;
+	}
+
 }
