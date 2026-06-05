@@ -2,6 +2,7 @@ package dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import model.Usuario;
@@ -26,5 +27,29 @@ public class UsuarioDao {
 		ConnectionFactory.closeConnection(conn);
 		ps.close();
 		return true;
+	}
+
+    public Usuario login(String cpf, String senha) {
+        String sql = "SELECT * FROM usuarios WHERE cpf = ? AND senha = ?";
+		try (Connection conn = ConnectionFactory.getConnection();
+				PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setString(1, cpf);
+			ps.setString(2, senha);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				return new Usuario(
+					rs.getString("nome"),
+					rs.getString("email"),
+					rs.getString("senha"),
+					rs.getString("cpf"),
+					rs.getString("telefone"),
+					model.Perfil.valueOf(rs.getString("perfil")),
+					rs.getBoolean("administrador")
+				);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
