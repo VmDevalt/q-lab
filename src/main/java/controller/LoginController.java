@@ -8,18 +8,11 @@ public class LoginController {
 	public Usuario  logarUsuario(String cpf, String hashSenha) throws Exception{
 		
 			UsuarioDao dao = new UsuarioDao();
-            Usuario usuario = dao.buscarPorCpf(cpf);
+            Usuario usuario = dao.login(cpf, hashSenha);
             
            if (usuario == null) {
-                 throw new Exception("User not found.");
+                 throw new Exception("CPF ou senha incorretos.");
            }
-		 if (!usuario.getSenha().equals(hashSenha)) {
-			throw new Exception("Senha incorreta.");
-        
-		}
-        
-		
 		return usuario;
-		
 	}
 }
