@@ -72,36 +72,37 @@ public class TelaSelecionarLab extends JFrame {
 		lblLabs.setForeground(new Color(165, 214, 167));
 		lblLabs.setBounds(12, 8, 160, 14);
 		painelNav.add(lblLabs);
-
+		
+		JButton btnLab01 = criarBotaoMenu("Lab 01");
+		btnLab01.setBounds(4, 26, 170, 32);
+		btnLab01.addActionListener(e -> cardLayout.show(painelConteudo, "LAB01"));
+		painelNav.add(btnLab01);
+		
 		JButton btnLab02 = criarBotaoMenu("Lab 02");
-		btnLab02.setBounds(4, 26, 170, 32);
+		btnLab02.setBounds(4, 64, 170, 32);
 		btnLab02.addActionListener(e -> cardLayout.show(painelConteudo, "LAB02"));
 		painelNav.add(btnLab02);
 
 		JButton btnLab03 = criarBotaoMenu("Lab 03");
-		btnLab03.setBounds(4, 64, 170, 32);
+		btnLab03.setBounds(4, 102, 170, 32);
 		btnLab03.addActionListener(e -> cardLayout.show(painelConteudo, "LAB03"));
 		painelNav.add(btnLab03);
 
+		JButton btnLab05 = criarBotaoMenu("Lab 05");
+		btnLab05.setBounds(4, 140, 170, 32);
+		btnLab05.addActionListener(e -> cardLayout.show(painelConteudo, "LAB05"));
+		painelNav.add(btnLab05);
+
 		JButton btnLab06 = criarBotaoMenu("Lab 06");
-		btnLab06.setBounds(4, 102, 170, 32);
+		btnLab06.setBounds(4, 178, 170, 32);
 		btnLab06.addActionListener(e -> cardLayout.show(painelConteudo, "LAB06"));
 		painelNav.add(btnLab06);
-
-		JButton btnLab01 = criarBotaoMenu("Lab 01");
-		btnLab01.setBounds(4, 140, 170, 32);
-		btnLab01.addActionListener(e -> cardLayout.show(painelConteudo, "LAB01"));
-		painelNav.add(btnLab01);
-
+		
 		JButton btnLab07 = criarBotaoMenu("Lab 07");
-		btnLab07.setBounds(4, 178, 170, 32);
+		btnLab07.setBounds(4, 216, 170, 32);
 		btnLab07.addActionListener(e -> cardLayout.show(painelConteudo, "LAB07"));
 		painelNav.add(btnLab07);
 
-		JButton btnLab05 = criarBotaoMenu("Lab 05");
-		btnLab05.setBounds(4, 216, 170, 32);
-		btnLab05.addActionListener(e -> cardLayout.show(painelConteudo, "LAB05"));
-		painelNav.add(btnLab05);
 
 		JLabel lblAdmin = new JLabel("ADMINISTRAÇÃO");
 		lblAdmin.setFont(new Font("Calibri", Font.BOLD, 10));
@@ -157,7 +158,7 @@ public class TelaSelecionarLab extends JFrame {
 			{"Lab 06", "Prática de IA",   "1° Andar"},
 			{"Lab 07", "Informática 2",     "1° Andar"},
 		};
-		String[] cardKeys = {"LAB02", "LAB03", "LAB06", "LAB01", "LAB07", "LAB05"};
+		String[] cardKeys = {"LAB01", "LAB02", "LAB03", "LAB05", "LAB06",  "LAB07"};
 
 		painelConteudo.add(criarPainelGridLabs(labs, cardKeys), "LABS");
 
