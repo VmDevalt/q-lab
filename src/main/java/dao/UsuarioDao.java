@@ -11,7 +11,7 @@ import util.ConnectionFactory;
 
 public class UsuarioDao {
 	public boolean cadastrarUsuario(Usuario usuario) throws SQLException {
-		String sql = "insert into usuarios (nome,email,cpf,telefone,senha,perfil,administrador) values(?,?,?,?,?,?,?)";
+		String sql = "insert into usuarios (nome,email,cpf,telefone,senha,perfil,administrador,matricula) values(?,?,?,?,?,?,?,?)";
 		Connection conn = ConnectionFactory.getConnection();
 		PreparedStatement ps = conn.prepareStatement(sql);
 
@@ -22,6 +22,7 @@ public class UsuarioDao {
 		ps.setString(5, usuario.getSenha());
 		ps.setString(6, usuario.getPerfil().name());
 		ps.setBoolean(7, usuario.isAdministrador());
+		ps.setString(8, usuario.getMatricula());
 
 		ps.executeUpdate();
 
@@ -30,11 +31,11 @@ public class UsuarioDao {
 		return true;
 	}
 
-	public Usuario login(String cpf, String senha) throws SQLException {
-		String sql = "SELECT * FROM usuarios WHERE cpf = ?";
+	public Usuario login(String matricula, String senha) throws SQLException {
+		String sql = "SELECT * FROM usuarios WHERE matricula = ?";
 		try (Connection conn = ConnectionFactory.getConnection();
 				PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setString(1, cpf);
+			ps.setString(1, matricula);
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				String senhaBanco = rs.getString("senha").trim();
@@ -42,6 +43,7 @@ public class UsuarioDao {
 					return new Usuario(
 						rs.getString("nome"),
 						rs.getString("email"),
+						rs.getString("matricula"),
 						senhaBanco,
 						rs.getString("cpf"),
 						rs.getString("telefone"),

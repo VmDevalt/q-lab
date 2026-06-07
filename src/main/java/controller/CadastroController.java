@@ -11,9 +11,9 @@ import util.ConnectionFactory;
 
 public class CadastroController {
 
-	public boolean CadastrarUsuario(String nome, String email, String cpf, String telefone, String hashSenha, Perfil perfil, boolean administrador)
+	public boolean CadastrarUsuario(String nome, String email, String matricula, String cpf, String telefone, String hashSenha, Perfil perfil, boolean administrador)
 	{
-		Usuario usuario = new Usuario(nome, email, hashSenha, cpf, telefone, perfil, administrador);
+		Usuario usuario = new Usuario(nome, email,  hashSenha, matricula, cpf, telefone, perfil, administrador);
 		try {
 			UsuarioDao dao = new UsuarioDao();
 			return dao.cadastrarUsuario(usuario); 

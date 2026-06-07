@@ -31,7 +31,7 @@ public class TelaLogin extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JPasswordField passwordField;
-	private JFormattedTextField campoCpf;
+	private JFormattedTextField campoMatricula;
 	private boolean senhaVisivel = false;
 
 	public static void main(String[] args) {
@@ -108,23 +108,16 @@ public class TelaLogin extends JFrame {
 		passwordField.setBounds(716, 310, 207, 26);
 		painelPrincipal.add(passwordField);
 
-		campoCpf = new JFormattedTextField();
-		campoCpf.setForeground(new Color(0, 0, 0));
-		campoCpf.setBounds(716, 229, 207, 26);
-		campoCpf.setColumns(10);
-		try {
-			MaskFormatter mascaraCpf = new MaskFormatter("###.###.###-##");
-			mascaraCpf.setPlaceholderCharacter('_');
-			mascaraCpf.install(campoCpf);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		painelPrincipal.add(campoCpf);
+		campoMatricula = new JFormattedTextField();
+		campoMatricula.setForeground(new Color(0, 0, 0));
+		campoMatricula.setBounds(716, 229, 207, 26);
+		campoMatricula.setColumns(10);
+		painelPrincipal.add(campoMatricula);
 
-		JLabel labelCpf = new JLabel("CPF");
-		labelCpf.setFont(new Font("Calibri", Font.PLAIN, 21));
-		labelCpf.setBounds(628, 231, 124, 25);
-		painelPrincipal.add(labelCpf);
+		JLabel labelMatricula = new JLabel("Matrícula");
+		labelMatricula.setFont(new Font("Calibri", Font.PLAIN, 21));
+		labelMatricula.setBounds(628, 231, 124, 25);
+		painelPrincipal.add(labelMatricula);
 
 		JLabel labelSenha = new JLabel("Senha");
 		labelSenha.setFont(new Font("Calibri", Font.PLAIN, 21));
@@ -134,13 +127,13 @@ public class TelaLogin extends JFrame {
 		JButton btnEntrar = new JButton("Entrar");
 		btnEntrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String cpf = campoCpf.getText();
+				String matricula = campoMatricula.getText();
 				char[] senhaChars = passwordField.getPassword();
 				String senha = new String(senhaChars);
 				Arrays.fill(senhaChars, '\0');
 
-				if (cpf.contains("_") || cpf.replace(".", "").replace("-", "").isBlank()) {
-					JOptionPane.showMessageDialog(TelaLogin.this, "Informe um CPF válido.", "Aviso", JOptionPane.WARNING_MESSAGE);
+				if (matricula.contains("_") || matricula.replace(".", "").replace("-", "").isBlank()) {
+					JOptionPane.showMessageDialog(TelaLogin.this, "Informe uma matrícula válida.", "Aviso", JOptionPane.WARNING_MESSAGE);
 					return;
 				}
 				if (senha.isEmpty()) {
@@ -150,7 +143,7 @@ public class TelaLogin extends JFrame {
 
 				try {
 					LoginController controller = new LoginController();
-					Usuario usuario = controller.logarUsuario(cpf, senha);
+					Usuario usuario = controller.logarUsuario(matricula, senha);
 					TelaSelecionarLab tela = new TelaSelecionarLab(usuario);
 					tela.setVisible(true);
 					dispose();
