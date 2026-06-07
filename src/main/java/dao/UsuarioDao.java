@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import model.Usuario;
 import util.ConnectionFactory;
 
@@ -21,35 +22,42 @@ public class UsuarioDao {
 		ps.setString(5, usuario.getSenha());
 		ps.setString(6, usuario.getPerfil().name());
 		ps.setBoolean(7, usuario.isAdministrador());
-		
+
 		ps.executeUpdate();
-		
+
 		ConnectionFactory.closeConnection(conn);
 		ps.close();
 		return true;
 	}
 
-    public Usuario login(String cpf, String senha) {
-        String sql = "SELECT * FROM usuarios WHERE cpf = ? AND senha = ?";
+	public Usuario login(String cpf, String senha) throws SQLException {
+		String sql = "SELECT * FROM usuarios WHERE cpf = ?";
 		try (Connection conn = ConnectionFactory.getConnection();
 				PreparedStatement ps = conn.prepareStatement(sql)) {
 			ps.setString(1, cpf);
-			ps.setString(2, senha);
 			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				return new Usuario(
-					rs.getString("nome"),
-					rs.getString("email"),
-					rs.getString("senha"),
-					rs.getString("cpf"),
-					rs.getString("telefone"),
-					model.Perfil.valueOf(rs.getString("perfil")),
-					rs.getBoolean("administrador")
-				);
+			while (rs.next()) {
+				String senhaBanco = rs.getString("senha").trim();
+				if (verificarSenha(senha, senhaBanco)) {
+					return new Usuario(
+						rs.getString("nome"),
+						rs.getString("email"),
+						senhaBanco,
+						rs.getString("cpf"),
+						rs.getString("telefone"),
+						model.Perfil.valueOf(rs.getString("perfil")),
+						rs.getBoolean("administrador")
+					);
+				}
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private boolean verificarSenha(String senhaDigitada, String senhaBanco) {
+		if (senhaBanco != null && senhaBanco.startsWith("$2")) {
+			return BCrypt.verifyer().verify(senhaDigitada.toCharArray(), senhaBanco).verified;
+		}
+		return senhaDigitada.equals(senhaBanco);
 	}
 }

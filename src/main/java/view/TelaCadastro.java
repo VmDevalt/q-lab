@@ -8,7 +8,8 @@ import javax.swing.text.MaskFormatter;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 
-
+import controller.CadastroController;
+import model.Perfil;
 import util.ImageUtil;
 
 import javax.swing.JButton;
@@ -40,6 +41,7 @@ public class TelaCadastro extends JFrame {
 	private JComboBox comboBox;
 	private Boolean senhaVisivel = false;
 	private Boolean confSenhaVisivel = false;
+	private JCheckBox checkBoxAdministrador;
 
 	/**
 	 * Launch the application.
@@ -128,15 +130,28 @@ public class TelaCadastro extends JFrame {
 					return;
 				}
 
+				Perfil[] perfis = { Perfil.PROFESSOR, Perfil.TECNICO, Perfil.GUARDIAO };
+				Perfil perfilSelecionado = perfis[comboBox.getSelectedIndex() - 1];
+				boolean administrador = checkBoxAdministrador.isSelected();
+
 				String hashSenha = BCrypt.with(BCrypt.Version.VERSION_2A).hashToString(12, senha);
 				Arrays.fill(senha, '\0');
 				Arrays.fill(confirmarSenha, '\0');
-				JOptionPane.showMessageDialog(null, "Cadastro realizado com sucesso!");
+
+				CadastroController controller = new CadastroController();
+				boolean sucesso = controller.CadastrarUsuario(nome, email, cpf, telefone, hashSenha, perfilSelecionado, administrador);
+
+				if (sucesso) {
+					JOptionPane.showMessageDialog(TelaCadastro.this, "Cadastro realizado com sucesso!");
+					dispose();
+				} else {
+					JOptionPane.showMessageDialog(TelaCadastro.this, "Erro ao realizar cadastro. Verifique os dados e tente novamente.", "Erro", JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		btnCadastrar.setForeground(new Color(255, 255, 255));
 		btnCadastrar.setBackground(new Color(34, 139, 34));
-		btnCadastrar.setBounds(566, 510, 152, 50);
+		btnCadastrar.setBounds(562, 545, 152, 50);
 		btnCadastrar.setFocusable(false);
 		contentPane.add(btnCadastrar);
 		
@@ -183,6 +198,7 @@ public class TelaCadastro extends JFrame {
 		JLabel labelConfirmarSenha = new JLabel("Confirmar Senha");
 		labelConfirmarSenha.setFont(new Font("Calibri", Font.PLAIN, 18));
 		labelConfirmarSenha.setBounds(582, 454, 141, 34);
+		labelConfirmarSenha.setBounds(582, 454, 141, 34);
 		contentPane.add(labelConfirmarSenha);
 
 		JLabel labelEmail = new JLabel("Email");
@@ -198,13 +214,19 @@ public class TelaCadastro extends JFrame {
 		
 		comboBox = new JComboBox();
 		comboBox.setFont(new Font("Calibri", Font.BOLD, 13));
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"    Selecione...", "    Administrador", "    Professor", "    Técnico", "    Guardião"}));
-		comboBox.setBounds(566, 114, 141, 28);
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"    Selecione...", "    Professor", "    Técnico", "    Guardião"}));
+		comboBox.setBounds(410, 114, 141, 28);
 		contentPane.add(comboBox);
+
+		checkBoxAdministrador = new JCheckBox("Administrador");
+		checkBoxAdministrador.setFont(new Font("Calibri", Font.PLAIN, 20));
+		checkBoxAdministrador.setBackground(Color.WHITE);
+		checkBoxAdministrador.setBounds(689, 110, 185, 34);
+		contentPane.add(checkBoxAdministrador);
 
 		JLabel lblNewLabel_3 = new JLabel("Perfil");
 		lblNewLabel_3.setFont(new Font("Calibri", Font.PLAIN, 15));
-		lblNewLabel_3.setBounds(521, 118, 53, 21);
+		lblNewLabel_3.setBounds(328, 118, 53, 21);
 		contentPane.add(lblNewLabel_3);
 
 		campoSenha = new JPasswordField();
@@ -304,6 +326,12 @@ public class TelaCadastro extends JFrame {
 		
 		btnMostrarConfSenha.setBounds(878, 460, 21, 21);
 		contentPane.add(btnMostrarConfSenha);
+		
+		JSeparator separator = new JSeparator();
+		separator.setBackground(new Color(255, 255, 255));
+		separator.setForeground(new Color(0, 0, 0));
+		separator.setBounds(328, 162, 560, 2);
+		contentPane.add(separator);
 
 		}
 	

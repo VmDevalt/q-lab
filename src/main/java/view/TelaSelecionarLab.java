@@ -104,25 +104,31 @@ public class TelaSelecionarLab extends JFrame {
 		painelNav.add(btnLab07);
 
 
+		boolean isAdmin = usuarioLogado != null && usuarioLogado.isAdministrador();
+
 		JLabel lblAdmin = new JLabel("ADMINISTRAÇÃO");
 		lblAdmin.setFont(new Font("Calibri", Font.BOLD, 10));
 		lblAdmin.setForeground(new Color(165, 214, 167));
 		lblAdmin.setBounds(12, 265, 160, 14);
+		lblAdmin.setVisible(isAdmin);
 		painelNav.add(lblAdmin);
 
 		JButton btnDashboard = criarBotaoMenu("Dashboard");
 		btnDashboard.setBounds(4, 283, 170, 32);
 		btnDashboard.addActionListener(e -> cardLayout.show(painelConteudo, "DASHBOARD"));
+		btnDashboard.setVisible(isAdmin);
 		painelNav.add(btnDashboard);
 
 		JButton btnCadastrar = criarBotaoMenu("Cadastrar");
 		btnCadastrar.setBounds(4, 321, 170, 32);
 		btnCadastrar.addActionListener(e -> new TelaCadastro().setVisible(true));
+		btnCadastrar.setVisible(isAdmin);
 		painelNav.add(btnCadastrar);
 
 		JButton btnInterditar = criarBotaoMenu("Interditar");
 		btnInterditar.setBounds(4, 359, 170, 32);
 		btnInterditar.addActionListener(e -> cardLayout.show(painelConteudo, "INTERDITAR"));
+		btnInterditar.setVisible(isAdmin);
 		painelNav.add(btnInterditar);
 
 		painelNav.setPreferredSize(new Dimension(175, 405));
