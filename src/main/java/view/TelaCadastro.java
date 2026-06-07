@@ -39,6 +39,8 @@ public class TelaCadastro extends JFrame {
 	private JPasswordField campoConfirmarSenha;
 	private JFormattedTextField campoCpf;
 	private JComboBox comboBox;
+	private Boolean senhaVisivel = false;
+	private Boolean confSenhaVisivel = false;
 	private JCheckBox checkBoxAdministrador;
 
 	/**
@@ -196,6 +198,7 @@ public class TelaCadastro extends JFrame {
 		JLabel labelConfirmarSenha = new JLabel("Confirmar Senha");
 		labelConfirmarSenha.setFont(new Font("Calibri", Font.PLAIN, 18));
 		labelConfirmarSenha.setBounds(582, 454, 141, 34);
+		labelConfirmarSenha.setBounds(582, 454, 141, 34);
 		contentPane.add(labelConfirmarSenha);
 
 		JLabel labelEmail = new JLabel("Email");
@@ -228,14 +231,14 @@ public class TelaCadastro extends JFrame {
 
 		campoSenha = new JPasswordField();
 		campoSenha.setFont(new Font("Calibri", Font.BOLD, 11));
-		campoSenha.setBounds(400, 456, 167, 33);
+		campoSenha.setBounds(400, 456, 152, 33);
 		contentPane.add(campoSenha);
 
 		campoSenha.setBorder(BorderFactory.createLineBorder(Color.black,2));
 
 		campoConfirmarSenha = new JPasswordField();
 		campoConfirmarSenha.setFont(new Font("Calibri", Font.BOLD, 11));
-		campoConfirmarSenha.setBounds(714, 456, 174, 33);
+		campoConfirmarSenha.setBounds(713, 456, 161, 33);
 		contentPane.add(campoConfirmarSenha);
 
 		campoConfirmarSenha.setBorder(BorderFactory.createLineBorder(Color.black,2));
@@ -287,6 +290,42 @@ public class TelaCadastro extends JFrame {
 		labelIcone.setIcon(ImageUtil.redimensionarImagem(imagemLogoQlab, 166, 70));
 		labelIcone.setBounds(67, 21, 213, 107);
 		contentPane.add(labelIcone);
+		
+		JButton btnMostrarSenha = new JButton("");
+		btnMostrarSenha.setIcon(new ImageIcon(getClass().getResource("/images/olho.png")));
+		btnMostrarSenha.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (senhaVisivel){
+					campoSenha.setEchoChar('*');
+					senhaVisivel = false;
+					btnMostrarSenha.setIcon(new ImageIcon(getClass().getResource("/images/olho.png")));
+				} else {
+					campoSenha.setEchoChar('\0');
+					senhaVisivel = true;
+					btnMostrarSenha.setIcon(new ImageIcon(getClass().getResource("/images/olhoClos.png")));
+				}
+			}});
+		btnMostrarSenha.setBounds(553, 461, 21, 21);
+		contentPane.add(btnMostrarSenha);
+		
+		JButton btnMostrarConfSenha = new JButton("");
+		btnMostrarConfSenha.setIcon(new ImageIcon(getClass().getResource("/images/olho.png")));
+		btnMostrarConfSenha.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (confSenhaVisivel) {
+					campoConfirmarSenha.setEchoChar('*');
+					confSenhaVisivel = false;
+					btnMostrarConfSenha.setIcon(new ImageIcon(getClass().getResource("/images/olho.png")));					
+				} else {
+					campoConfirmarSenha.setEchoChar('\0');
+					confSenhaVisivel = true;
+					btnMostrarConfSenha.setIcon(new ImageIcon(getClass().getResource("/images/olhoClos.png")));
+				}
+			}
+		});
+		
+		btnMostrarConfSenha.setBounds(878, 460, 21, 21);
+		contentPane.add(btnMostrarConfSenha);
 		
 		JSeparator separator = new JSeparator();
 		separator.setBackground(new Color(255, 255, 255));
