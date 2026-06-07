@@ -5,13 +5,13 @@ import model.Usuario;
 
 public class LoginController {
 	
-	public Usuario  logarUsuario(String cpf, String hashSenha) throws Exception{
+	public Usuario  logarUsuario(String matricula, String hashSenha) throws Exception{
 		
 			UsuarioDao dao = new UsuarioDao();
-            Usuario usuario = dao.login(cpf, hashSenha);
+            Usuario usuario = dao.login(matricula, hashSenha);
             
            if (usuario == null) {
-                 throw new Exception("CPF ou senha incorretos.");
+                 throw new Exception("Matrícula ou senha incorretos.");
            }
 		return usuario;
 	}

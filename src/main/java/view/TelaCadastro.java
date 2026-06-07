@@ -38,6 +38,7 @@ public class TelaCadastro extends JFrame {
 	private JPasswordField campoSenha;
 	private JPasswordField campoConfirmarSenha;
 	private JFormattedTextField campoCpf;
+	private JTextField campoMatricula;
 	private JComboBox comboBox;
 	private Boolean senhaVisivel = false;
 	private Boolean confSenhaVisivel = false;
@@ -82,6 +83,7 @@ public class TelaCadastro extends JFrame {
 		btnCadastrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String nome = campoNome.getText().trim();
+				String matricula = campoMatricula.getText().trim();
 				String email = campoEmail.getText().trim();
 				String cpf = campoCpf.getText();
 				String telefone = campoTelefone.getText();
@@ -90,6 +92,11 @@ public class TelaCadastro extends JFrame {
 
 				if (nome.isEmpty() || nome.equals("Digite seu nome")) {
 					JOptionPane.showMessageDialog(null, "O campo Nome não pode estar vazio!");
+					return;
+				}
+
+				if (matricula.isEmpty()) {
+					JOptionPane.showMessageDialog(null, "O campo Matrícula não pode estar vazio!");
 					return;
 				}
 
@@ -139,7 +146,7 @@ public class TelaCadastro extends JFrame {
 				Arrays.fill(confirmarSenha, '\0');
 
 				CadastroController controller = new CadastroController();
-				boolean sucesso = controller.CadastrarUsuario(nome, email, cpf, telefone, hashSenha, perfilSelecionado, administrador);
+				boolean sucesso = controller.CadastrarUsuario(nome, email, matricula, cpf, telefone, hashSenha, perfilSelecionado, administrador);
 
 				if (sucesso) {
 					JOptionPane.showMessageDialog(TelaCadastro.this, "Cadastro realizado com sucesso!");
@@ -151,7 +158,7 @@ public class TelaCadastro extends JFrame {
 		});
 		btnCadastrar.setForeground(new Color(255, 255, 255));
 		btnCadastrar.setBackground(new Color(34, 139, 34));
-		btnCadastrar.setBounds(562, 545, 152, 50);
+		btnCadastrar.setBounds(562, 610, 152, 50);
 		btnCadastrar.setFocusable(false);
 		contentPane.add(btnCadastrar);
 		
@@ -161,17 +168,29 @@ public class TelaCadastro extends JFrame {
 		contentPane.add(campoNome);
 		campoNome.setColumns(10);
 		campoNome.setBorder(BorderFactory.createLineBorder(Color.black,2));
-		
+
+		JLabel labelMatricula = new JLabel("Matrícula");
+		labelMatricula.setFont(new Font("Calibri", Font.PLAIN, 18));
+		labelMatricula.setBounds(328, 248, 100, 24);
+		contentPane.add(labelMatricula);
+
+		campoMatricula = new JTextField();
+		campoMatricula.setFont(new Font("Calibri", Font.BOLD, 11));
+		campoMatricula.setBounds(400, 245, 474, 33);
+		campoMatricula.setColumns(10);
+		campoMatricula.setBorder(BorderFactory.createLineBorder(Color.black, 2));
+		contentPane.add(campoMatricula);
+
 		campoEmail = new JTextField();
 		campoEmail.setFont(new Font("Calibri", Font.BOLD, 11));
-		campoEmail.setBounds(400, 310, 474, 33);
+		campoEmail.setBounds(400, 375, 474, 33);
 		contentPane.add(campoEmail);
 		campoEmail.setColumns(10);
 		campoEmail.setBorder(BorderFactory.createLineBorder(Color.black,2));
 
 		JLabel labelSenha = new JLabel("Senha");
 		labelSenha.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelSenha.setBounds(328, 461, 58, 21);
+		labelSenha.setBounds(328, 526, 58, 21);
 		contentPane.add(labelSenha);
 		
 		JLabel labelNome = new JLabel("Nome");
@@ -181,7 +200,7 @@ public class TelaCadastro extends JFrame {
 		
 		campoTelefone = new JFormattedTextField();
 		campoTelefone.setFont(new Font("Calibri", Font.BOLD, 11));
-		campoTelefone.setBounds(400, 380, 474, 33);
+		campoTelefone.setBounds(400, 445, 474, 33);
 		contentPane.add(campoTelefone);
 		campoTelefone.setColumns(10);
 		campoTelefone.setBorder(BorderFactory.createLineBorder(Color.black,2));
@@ -197,19 +216,17 @@ public class TelaCadastro extends JFrame {
 
 		JLabel labelConfirmarSenha = new JLabel("Confirmar Senha");
 		labelConfirmarSenha.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelConfirmarSenha.setBounds(582, 454, 141, 34);
-		labelConfirmarSenha.setBounds(582, 454, 141, 34);
+		labelConfirmarSenha.setBounds(582, 519, 141, 34);
 		contentPane.add(labelConfirmarSenha);
 
 		JLabel labelEmail = new JLabel("Email");
 		labelEmail.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelEmail.setBounds(328, 315, 58, 21);
-
+		labelEmail.setBounds(328, 380, 58, 21);
 		contentPane.add(labelEmail);
 
 		JLabel labelTelefone = new JLabel("Telefone");
 		labelTelefone.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelTelefone.setBounds(328, 383, 78, 24);
+		labelTelefone.setBounds(328, 448, 78, 24);
 		contentPane.add(labelTelefone);
 		
 		comboBox = new JComboBox();
@@ -231,14 +248,14 @@ public class TelaCadastro extends JFrame {
 
 		campoSenha = new JPasswordField();
 		campoSenha.setFont(new Font("Calibri", Font.BOLD, 11));
-		campoSenha.setBounds(400, 456, 152, 33);
+		campoSenha.setBounds(400, 521, 152, 33);
 		contentPane.add(campoSenha);
 
 		campoSenha.setBorder(BorderFactory.createLineBorder(Color.black,2));
 
 		campoConfirmarSenha = new JPasswordField();
 		campoConfirmarSenha.setFont(new Font("Calibri", Font.BOLD, 11));
-		campoConfirmarSenha.setBounds(713, 456, 161, 33);
+		campoConfirmarSenha.setBounds(713, 521, 161, 33);
 		contentPane.add(campoConfirmarSenha);
 
 		campoConfirmarSenha.setBorder(BorderFactory.createLineBorder(Color.black,2));
@@ -248,13 +265,13 @@ public class TelaCadastro extends JFrame {
 		
 		JLabel labelCpf = new JLabel("CPF");
 		labelCpf.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelCpf.setBounds(328, 247, 58, 26);
+		labelCpf.setBounds(328, 312, 58, 26);
 		contentPane.add(labelCpf);
 
 		campoCpf = new JFormattedTextField();
 		campoCpf.setFont(new Font("Calibri", Font.BOLD, 11));
 		campoCpf.setColumns(10);
-		campoCpf.setBounds(400, 245, 474, 33);
+		campoCpf.setBounds(400, 310, 474, 33);
 		contentPane.add(campoCpf);
 		campoCpf.addFocusListener(new FocusAdapter() {
 			@Override
@@ -305,7 +322,7 @@ public class TelaCadastro extends JFrame {
 					btnMostrarSenha.setIcon(new ImageIcon(getClass().getResource("/images/olhoClos.png")));
 				}
 			}});
-		btnMostrarSenha.setBounds(553, 461, 21, 21);
+		btnMostrarSenha.setBounds(553, 526, 21, 21);
 		contentPane.add(btnMostrarSenha);
 		
 		JButton btnMostrarConfSenha = new JButton("");
@@ -324,7 +341,7 @@ public class TelaCadastro extends JFrame {
 			}
 		});
 		
-		btnMostrarConfSenha.setBounds(878, 460, 21, 21);
+		btnMostrarConfSenha.setBounds(878, 525, 21, 21);
 		contentPane.add(btnMostrarConfSenha);
 		
 		JSeparator separator = new JSeparator();
