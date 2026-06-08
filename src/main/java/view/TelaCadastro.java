@@ -137,7 +137,7 @@ public class TelaCadastro extends JFrame {
 					return;
 				}
 
-				Perfil[] perfis = { Perfil.PROFESSOR, Perfil.TECNICO, Perfil.GUARDIAO };
+				Perfil[] perfis = { Perfil.PROFESSOR, Perfil.TECNICO, Perfil.ESTUDANTEGUARDIAO };
 				Perfil perfilSelecionado = perfis[comboBox.getSelectedIndex() - 1];
 				boolean administrador = checkBoxAdministrador.isSelected();
 
