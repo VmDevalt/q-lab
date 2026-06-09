@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.MaskFormatter;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
@@ -98,7 +100,13 @@ public class TelaCadastro extends JFrame {
 				if (matricula.isEmpty()) {
 					JOptionPane.showMessageDialog(null, "O campo Matrícula não pode estar vazio!");
 					return;
-				}
+				}else if (!campoMatricula.getText().matches("\\d{5}[A-Z]{5}\\d{4}")) {
+		            JOptionPane.showMessageDialog(null, 
+		                    "Matrícula inválida! Use o formato: 20251ADSPL0076",
+		                    "Erro", 
+		                    JOptionPane.ERROR_MESSAGE);
+		                return; 
+		         }
 
 				if (email.isEmpty() || email.equals("Digite seu email")) {
 					JOptionPane.showMessageDialog(null, "O campo Email não pode estar vazio!");
@@ -180,6 +188,34 @@ public class TelaCadastro extends JFrame {
 		campoMatricula.setColumns(10);
 		campoMatricula.setBorder(BorderFactory.createLineBorder(Color.black, 2));
 		contentPane.add(campoMatricula);
+		
+		JTextPane matricula_validacao = new JTextPane();
+		matricula_validacao.setBackground(new Color(255, 0, 0));
+		matricula_validacao.setForeground(new Color(255, 255, 255));
+		matricula_validacao.setText("     invalido");
+		matricula_validacao.setBounds(884, 252, 69, 20);
+		contentPane.add(matricula_validacao);
+			
+		campoMatricula.getDocument().addDocumentListener(new DocumentListener () {
+			public void insertUpdate(DocumentEvent e) {validar();}
+			public void removeUpdate(DocumentEvent e) {validar();}
+			public void changedUpdate(DocumentEvent e) {validar();}
+			
+			public void validar() {
+				if (campoMatricula.getText().matches("\\d{5}[A-Z]{5}\\d{4}")) {
+					matricula_validacao.setText("    valido");
+					matricula_validacao.setBackground(new Color(0,128,0));
+					matricula_validacao.setForeground(new Color(255, 255, 255));
+
+				}else {
+					matricula_validacao.setBackground(new Color(255, 0, 0));
+					matricula_validacao.setForeground(new Color(255, 255, 255));
+					matricula_validacao.setText("   invalido");
+				}
+			}
+		});
+		
+		
 
 		campoEmail = new JTextField();
 		campoEmail.setFont(new Font("Calibri", Font.BOLD, 11));
@@ -349,8 +385,8 @@ public class TelaCadastro extends JFrame {
 		separator.setForeground(new Color(0, 0, 0));
 		separator.setBounds(328, 162, 560, 2);
 		contentPane.add(separator);
-
-		}
+	}
+	
 	
 	public void adicionarPlaceholder(JTextField campo, String textoPlaceholder) {
 		campo.setText(textoPlaceholder);
