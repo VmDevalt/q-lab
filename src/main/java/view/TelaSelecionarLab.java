@@ -189,8 +189,8 @@ public class TelaSelecionarLab extends JFrame {
 		titulo.setBounds(0, 25, 1062, 42);
 		painel.add(titulo);
 
-		int[] colX = {281, 456, 631};
-		int[] rowY  = {221, 401};
+		int[] colX = {631,456, 281, };
+		int[] rowY  = {401, 221};
 
 		for (int i = 0; i < labs.length; i++) {
 			int col = i % 3;
