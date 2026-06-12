@@ -157,12 +157,12 @@ public class TelaSelecionarLab extends JFrame {
 		contentPane.add(painelConteudo);
 
 		String[][] labs = {
-			{"Lab 01", "Redes",           "Térreo"},
-			{"Lab 02", "Informática",     "Térreo"},
-			{"Lab 03", "Desenvolvimento", "Térreo"},
-			{"Lab 05", "Sala do Diretório Acadêmico - ADS",               "1° Andar"},
-			{"Lab 06", "Prática de IA",   "1° Andar"},
-			{"Lab 07", "Informática 2",     "1° Andar"},
+			{"Lab 01", "Redes",           "Térreo",     "Ativo",      "15"},
+			{"Lab 02", "Informática",     "Térreo",     "Ativo",      "20"},
+			{"Lab 03", "Desenvolvimento", "Térreo",     "Ativo",      "18"},
+			{"Lab 05", "Sala do Diretório Acadêmico - ADS", "1° Andar", "Ativo", "12"},
+			{"Lab 06", "Prática de IA",   "1° Andar",   "Ativo",      "16"},
+			{"Lab 07", "Informática 2",   "1° Andar",   "Ativo",      "22"},
 		};
 		String[] cardKeys = {"LAB01", "LAB02", "LAB03", "LAB05", "LAB06",  "LAB07"};
 
@@ -189,25 +189,76 @@ public class TelaSelecionarLab extends JFrame {
 		titulo.setBounds(0, 25, 1062, 42);
 		painel.add(titulo);
 
-		int[] colX = {281, 456, 631};
-		int[] rowY  = {221, 401};
+		int[] colX = {100, 420, 740};
+		int[] rowY  = {100, 370};
+		
+		String[] imagemPaths = {
+			"/images/lab1.png",
+			"/images/lab2.jpeg", 
+			"/images/lab3.jpeg",
+			"/images/lab5.jpeg",
+			"/images/lab6.jpeg",
+			"/images/lab7.jpeg"
+		};
 
 		for (int i = 0; i < labs.length; i++) {
 			int col = i % 3;
 			int row = i / 3;
 			final String cardKey = cardKeys[i];
-
-			JButton btn = new JButton(
-				"<html><center>" + labs[i][0] + "<br>" + labs[i][1] + "<br><br>" + labs[i][2] + "</center></html>"
+			
+			JPanel painelLab = new JPanel();
+			painelLab.setLayout(null);
+			painelLab.setBounds(colX[col], rowY[row], 220, 250);
+			painelLab.setBackground(Color.WHITE);
+			painelLab.setBorder(BorderFactory.createLineBorder(new Color(34, 139, 34), 2));
+			painelLab.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			painelLab.addMouseListener(new java.awt.event.MouseAdapter() {
+				@Override
+				public void mouseEntered(java.awt.event.MouseEvent e) {
+					painelLab.setBackground(new Color(240, 245, 240));
+					painelLab.setBorder(BorderFactory.createLineBorder(new Color(34, 139, 34), 3));
+				}
+				
+				@Override
+				public void mouseExited(java.awt.event.MouseEvent e) {
+					painelLab.setBackground(Color.WHITE);
+					painelLab.setBorder(BorderFactory.createLineBorder(new Color(34, 139, 34), 2));
+				}
+				
+				@Override
+				public void mouseClicked(java.awt.event.MouseEvent e) {
+					cardLayout.show(painelConteudo, cardKey);
+				}
+			});
+			
+			try {
+				ImageIcon iconLab = new ImageIcon(getClass().getResource(imagemPaths[i]));
+				Image imagemRedimensionada = iconLab.getImage().getScaledInstance(190, 110, Image.SCALE_SMOOTH);
+				JLabel lblImagem = new JLabel(new ImageIcon(imagemRedimensionada));
+				lblImagem.setBounds(15, 10, 190, 110);
+				painelLab.add(lblImagem);
+			} catch (Exception e) {
+				System.err.println("Erro ao carregar imagem: " + imagemPaths[i]);
+			}
+			
+			JLabel lblNome = new JLabel(labs[i][0], SwingConstants.CENTER);
+			lblNome.setFont(new Font("Calibri", Font.BOLD, 17));
+			lblNome.setForeground(new Color(34, 139, 34));
+			lblNome.setBounds(5, 125, 210, 22);
+			painelLab.add(lblNome);
+			
+			JLabel lblDescricao = new JLabel(
+				"<html><center>" + labs[i][1] + "<br><br>" +
+				"<b>Status:</b> " + labs[i][3] + "<br>" +
+				"<b>Computadores:</b> " + labs[i][4] + "</center></html>",
+				SwingConstants.CENTER
 			);
-			btn.setFont(new Font("Calibri", Font.PLAIN, 14));
-			btn.setBounds(colX[col], rowY[row], 150, 150);
-			btn.setForeground(Color.WHITE);
-			btn.setBackground(new Color(34, 139, 34));
-			btn.setFocusable(false);
-			btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-			btn.addActionListener(e -> cardLayout.show(painelConteudo, cardKey));
-			painel.add(btn);
+			lblDescricao.setFont(new Font("Calibri", Font.PLAIN, 12));
+			lblDescricao.setForeground(Color.GRAY);
+			lblDescricao.setBounds(5, 150, 210, 90);
+			painelLab.add(lblDescricao);
+			
+			painel.add(painelLab);
 		}
 
 		return painel;
@@ -239,6 +290,18 @@ public class TelaSelecionarLab extends JFrame {
 		andar.setForeground(Color.GRAY);
 		andar.setBounds(0, 75, 1062, 25);
 		painel.add(andar);
+
+		JLabel lblStatus = new JLabel("Status: " + lab[3], SwingConstants.CENTER);
+		lblStatus.setFont(new Font("Calibri", Font.PLAIN, 14));
+		lblStatus.setForeground(new Color(34, 139, 34));
+		lblStatus.setBounds(0, 120, 1062, 25);
+		painel.add(lblStatus);
+
+		JLabel lblComputadores = new JLabel("Computadores funcionando: " + lab[4], SwingConstants.CENTER);
+		lblComputadores.setFont(new Font("Calibri", Font.PLAIN, 14));
+		lblComputadores.setForeground(Color.GRAY);
+		lblComputadores.setBounds(0, 155, 1062, 25);
+		painel.add(lblComputadores);
 
 		JLabel placeholder = new JLabel("Detalhes do laboratório em desenvolvimento", SwingConstants.CENTER);
 		placeholder.setFont(new Font("Calibri", Font.ITALIC, 14));
@@ -273,10 +336,26 @@ public class TelaSelecionarLab extends JFrame {
 		btn.setFont(new Font("Calibri", Font.PLAIN, 13));
 		btn.setForeground(Color.WHITE);
 		btn.setBackground(new Color(27, 94, 32));
-		btn.setBorderPainted(false);
+		btn.setBorderPainted(true);
+		btn.setBorder(BorderFactory.createLineBorder(new Color(27, 94, 32), 2));
 		btn.setFocusable(false);
 		btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		btn.setHorizontalAlignment(SwingConstants.LEFT);
+		
+		btn.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
+			public void mouseEntered(java.awt.event.MouseEvent e) {
+				btn.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+				btn.setBackground(new Color(40, 110, 45));
+			}
+			
+			@Override
+			public void mouseExited(java.awt.event.MouseEvent e) {
+				btn.setBorder(BorderFactory.createLineBorder(new Color(27, 94, 32), 2));
+				btn.setBackground(new Color(27, 94, 32));
+			}
+		});
+		
 		return btn;
 	}
 }

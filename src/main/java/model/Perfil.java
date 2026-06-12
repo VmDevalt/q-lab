@@ -1,8 +1,7 @@
 package model;
 
 public enum Perfil {
-		ADMINISTRADOR,
 		PROFESSOR,
 		TECNICO,
-		GUARDIAO
+		ESTUDANTE_GUARDIAO
 }

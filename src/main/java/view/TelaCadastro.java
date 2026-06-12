@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.MaskFormatter;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
@@ -11,6 +13,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 import controller.CadastroController;
 import model.Perfil;
 import util.ImageUtil;
+import util.ValidarSenhaUtil;
 
 import javax.swing.JButton;
 import javax.swing.JTextField;
@@ -38,7 +41,8 @@ public class TelaCadastro extends JFrame {
 	private JPasswordField campoSenha;
 	private JPasswordField campoConfirmarSenha;
 	private JFormattedTextField campoCpf;
-	private JComboBox comboBox;
+	private JTextField campoMatricula;
+	private JComboBox<String> comboBox;
 	private Boolean senhaVisivel = false;
 	private Boolean confSenhaVisivel = false;
 	private JCheckBox checkBoxAdministrador;
@@ -82,15 +86,49 @@ public class TelaCadastro extends JFrame {
 		btnCadastrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String nome = campoNome.getText().trim();
+				String matricula = campoMatricula.getText().trim();
 				String email = campoEmail.getText().trim();
 				String cpf = campoCpf.getText();
 				String telefone = campoTelefone.getText();
 				char[] senha = campoSenha.getPassword();
 				char[] confirmarSenha = campoConfirmarSenha.getPassword();
+				String senhaString = new String (senha);
+				String requisitosSenha =  ValidarSenhaUtil.validarSenha(senhaString);
 
 				if (nome.isEmpty() || nome.equals("Digite seu nome")) {
 					JOptionPane.showMessageDialog(null, "O campo Nome não pode estar vazio!");
 					return;
+				}
+
+				if (matricula.isEmpty()) {
+					JOptionPane.showMessageDialog(null, "O campo Matrícula não pode estar vazio!");
+					return;
+				}
+				
+				if (comboBox.getSelectedIndex() == 0) {
+					JOptionPane.showMessageDialog(null, "Selecione um perfil!");
+					return;
+				}
+				
+				Perfil[] perfis = Perfil.values();
+				Perfil perfilSelecionado = perfis[comboBox.getSelectedIndex() - 1];
+				
+				if (perfilSelecionado == Perfil.PROFESSOR || perfilSelecionado == Perfil.TECNICO) {
+					if (!campoMatricula.getText().matches("\\d{8}")) {
+						JOptionPane.showMessageDialog(null, 
+							"Matrícula inválida! Use o formato: 12345678 (8 dígitos)",
+							"Erro", 
+							JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+				} else if (perfilSelecionado == Perfil.ESTUDANTE_GUARDIAO) {
+					if (!campoMatricula.getText().matches("\\d{5}[A-Z]{5}\\d{4}")) {
+						JOptionPane.showMessageDialog(null, 
+							"Matrícula inválida! Use o formato: 20251ADSPL0076",
+							"Erro", 
+							JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 				}
 
 				if (email.isEmpty() || email.equals("Digite seu email")) {
@@ -116,8 +154,8 @@ public class TelaCadastro extends JFrame {
 					JOptionPane.showMessageDialog(null, "O campo Senha não pode estar vazio!");
 					return;
 				}
-				if (senha.length < 6) {
-					JOptionPane.showMessageDialog(null, "A senha deve ter pelo menos 6 caracteres!");
+				if (requisitosSenha != "") {
+					JOptionPane.showMessageDialog(null, requisitosSenha);
 					return;
 				}
 				if (!Arrays.equals(senha, confirmarSenha)) {
@@ -125,13 +163,6 @@ public class TelaCadastro extends JFrame {
 					return;
 				}
 
-				if (comboBox.getSelectedIndex() == 0) {
-					JOptionPane.showMessageDialog(null, "Selecione um perfil!");
-					return;
-				}
-
-				Perfil[] perfis = { Perfil.PROFESSOR, Perfil.TECNICO, Perfil.GUARDIAO };
-				Perfil perfilSelecionado = perfis[comboBox.getSelectedIndex() - 1];
 				boolean administrador = checkBoxAdministrador.isSelected();
 
 				String hashSenha = BCrypt.with(BCrypt.Version.VERSION_2A).hashToString(12, senha);
@@ -139,7 +170,7 @@ public class TelaCadastro extends JFrame {
 				Arrays.fill(confirmarSenha, '\0');
 
 				CadastroController controller = new CadastroController();
-				boolean sucesso = controller.CadastrarUsuario(nome, email, cpf, telefone, hashSenha, perfilSelecionado, administrador);
+				boolean sucesso = controller.CadastrarUsuario(nome, email, matricula, cpf, telefone, hashSenha, perfilSelecionado, administrador);
 
 				if (sucesso) {
 					JOptionPane.showMessageDialog(TelaCadastro.this, "Cadastro realizado com sucesso!");
@@ -151,7 +182,7 @@ public class TelaCadastro extends JFrame {
 		});
 		btnCadastrar.setForeground(new Color(255, 255, 255));
 		btnCadastrar.setBackground(new Color(34, 139, 34));
-		btnCadastrar.setBounds(562, 545, 152, 50);
+		btnCadastrar.setBounds(562, 610, 152, 50);
 		btnCadastrar.setFocusable(false);
 		contentPane.add(btnCadastrar);
 		
@@ -161,17 +192,70 @@ public class TelaCadastro extends JFrame {
 		contentPane.add(campoNome);
 		campoNome.setColumns(10);
 		campoNome.setBorder(BorderFactory.createLineBorder(Color.black,2));
+
+		JLabel labelMatricula = new JLabel("Matrícula");
+		labelMatricula.setFont(new Font("Calibri", Font.PLAIN, 18));
+		labelMatricula.setBounds(328, 248, 100, 24);
+		contentPane.add(labelMatricula);
+
+		campoMatricula = new JTextField();
+		campoMatricula.setFont(new Font("Calibri", Font.BOLD, 11));
+		campoMatricula.setBounds(400, 245, 474, 33);
+		campoMatricula.setColumns(10);
+		campoMatricula.setBorder(BorderFactory.createLineBorder(Color.black, 2));
+		contentPane.add(campoMatricula);
 		
+		JTextPane matricula_validacao = new JTextPane();
+		matricula_validacao.setBackground(new Color(255, 0, 0));
+		matricula_validacao.setForeground(new Color(255, 255, 255));
+		matricula_validacao.setText("     invalido");
+		matricula_validacao.setBounds(884, 252, 69, 20);
+		contentPane.add(matricula_validacao);
+			
+		campoMatricula.getDocument().addDocumentListener(new DocumentListener () {
+			public void insertUpdate(DocumentEvent e) {validar();}
+			public void removeUpdate(DocumentEvent e) {validar();}
+			public void changedUpdate(DocumentEvent e) {validar();}
+			
+			public void validar() {
+				Perfil[] perfis = Perfil.values();
+				int perfilIndex = comboBox.getSelectedIndex();
+				boolean valido = false;
+				
+				if (perfilIndex > 0) {
+					Perfil perfilSelecionado = perfis[perfilIndex - 1];
+					
+					if (perfilSelecionado == Perfil.PROFESSOR || perfilSelecionado == Perfil.TECNICO) {
+						valido = campoMatricula.getText().matches("\\d{8}");
+					} else if (perfilSelecionado == Perfil.ESTUDANTE_GUARDIAO) {
+						valido = campoMatricula.getText().matches("\\d{5}[A-Z]{5}\\d{4}");
+					}
+				}
+				
+				if (valido) {
+					matricula_validacao.setText("    valido");
+					matricula_validacao.setBackground(new Color(0,128,0));
+					matricula_validacao.setForeground(new Color(255, 255, 255));
+				} else {
+					matricula_validacao.setBackground(new Color(255, 0, 0));
+					matricula_validacao.setForeground(new Color(255, 255, 255));
+					matricula_validacao.setText("   invalido");
+				}
+			}
+		});
+		
+		
+
 		campoEmail = new JTextField();
 		campoEmail.setFont(new Font("Calibri", Font.BOLD, 11));
-		campoEmail.setBounds(400, 310, 474, 33);
+		campoEmail.setBounds(400, 375, 474, 33);
 		contentPane.add(campoEmail);
 		campoEmail.setColumns(10);
 		campoEmail.setBorder(BorderFactory.createLineBorder(Color.black,2));
 
 		JLabel labelSenha = new JLabel("Senha");
 		labelSenha.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelSenha.setBounds(328, 461, 58, 21);
+		labelSenha.setBounds(328, 526, 58, 21);
 		contentPane.add(labelSenha);
 		
 		JLabel labelNome = new JLabel("Nome");
@@ -181,41 +265,44 @@ public class TelaCadastro extends JFrame {
 		
 		campoTelefone = new JFormattedTextField();
 		campoTelefone.setFont(new Font("Calibri", Font.BOLD, 11));
-		campoTelefone.setBounds(400, 380, 474, 33);
+		campoTelefone.setBounds(400, 445, 350, 33);
 		contentPane.add(campoTelefone);
 		campoTelefone.setColumns(10);
 		campoTelefone.setBorder(BorderFactory.createLineBorder(Color.black,2));
 		
 		MaskFormatter mascaraTelefone;
-		try{
-		    mascaraTelefone = new MaskFormatter("(##) #####-####");
-		    mascaraTelefone.setPlaceholderCharacter('_');
-		    mascaraTelefone.install(campoTelefone);
-		}catch (ParseException e){
-		    e.printStackTrace();
+		try {
+			mascaraTelefone = new MaskFormatter("(##) #####-####");
+			mascaraTelefone.setPlaceholderCharacter('_');
+			mascaraTelefone.install(campoTelefone);
+		} catch (ParseException e) {
+			e.printStackTrace();
 		}
 
 		JLabel labelConfirmarSenha = new JLabel("Confirmar Senha");
 		labelConfirmarSenha.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelConfirmarSenha.setBounds(582, 454, 141, 34);
-		labelConfirmarSenha.setBounds(582, 454, 141, 34);
+		labelConfirmarSenha.setBounds(582, 519, 141, 34);
 		contentPane.add(labelConfirmarSenha);
 
 		JLabel labelEmail = new JLabel("Email");
 		labelEmail.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelEmail.setBounds(328, 315, 58, 21);
-
+		labelEmail.setBounds(328, 380, 58, 21);
 		contentPane.add(labelEmail);
 
 		JLabel labelTelefone = new JLabel("Telefone");
 		labelTelefone.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelTelefone.setBounds(328, 383, 78, 24);
+		labelTelefone.setBounds(328, 448, 78, 24);
 		contentPane.add(labelTelefone);
 		
-		comboBox = new JComboBox();
+		comboBox = new JComboBox<String>();
 		comboBox.setFont(new Font("Calibri", Font.BOLD, 13));
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"    Selecione...", "    Professor", "    Técnico", "    Guardião"}));
+		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"    Selecione...", "    Professor", "    Técnico", "    Guardião"}));
 		comboBox.setBounds(410, 114, 141, 28);
+		comboBox.addItemListener(new java.awt.event.ItemListener() {
+			public void itemStateChanged(java.awt.event.ItemEvent evt) {
+				campoMatricula.setText(campoMatricula.getText());
+			}
+		});
 		contentPane.add(comboBox);
 
 		checkBoxAdministrador = new JCheckBox("Administrador");
@@ -231,14 +318,14 @@ public class TelaCadastro extends JFrame {
 
 		campoSenha = new JPasswordField();
 		campoSenha.setFont(new Font("Calibri", Font.BOLD, 11));
-		campoSenha.setBounds(400, 456, 152, 33);
+		campoSenha.setBounds(400, 521, 152, 33);
 		contentPane.add(campoSenha);
 
 		campoSenha.setBorder(BorderFactory.createLineBorder(Color.black,2));
 
 		campoConfirmarSenha = new JPasswordField();
 		campoConfirmarSenha.setFont(new Font("Calibri", Font.BOLD, 11));
-		campoConfirmarSenha.setBounds(713, 456, 161, 33);
+		campoConfirmarSenha.setBounds(713, 521, 161, 33);
 		contentPane.add(campoConfirmarSenha);
 
 		campoConfirmarSenha.setBorder(BorderFactory.createLineBorder(Color.black,2));
@@ -248,13 +335,13 @@ public class TelaCadastro extends JFrame {
 		
 		JLabel labelCpf = new JLabel("CPF");
 		labelCpf.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelCpf.setBounds(328, 247, 58, 26);
+		labelCpf.setBounds(328, 312, 58, 26);
 		contentPane.add(labelCpf);
 
 		campoCpf = new JFormattedTextField();
 		campoCpf.setFont(new Font("Calibri", Font.BOLD, 11));
 		campoCpf.setColumns(10);
-		campoCpf.setBounds(400, 245, 474, 33);
+		campoCpf.setBounds(400, 310, 474, 33);
 		contentPane.add(campoCpf);
 		campoCpf.addFocusListener(new FocusAdapter() {
 			@Override
@@ -305,7 +392,7 @@ public class TelaCadastro extends JFrame {
 					btnMostrarSenha.setIcon(new ImageIcon(getClass().getResource("/images/olhoClos.png")));
 				}
 			}});
-		btnMostrarSenha.setBounds(553, 461, 21, 21);
+		btnMostrarSenha.setBounds(553, 526, 21, 21);
 		contentPane.add(btnMostrarSenha);
 		
 		JButton btnMostrarConfSenha = new JButton("");
@@ -324,7 +411,7 @@ public class TelaCadastro extends JFrame {
 			}
 		});
 		
-		btnMostrarConfSenha.setBounds(878, 460, 21, 21);
+		btnMostrarConfSenha.setBounds(878, 525, 21, 21);
 		contentPane.add(btnMostrarConfSenha);
 		
 		JSeparator separator = new JSeparator();
@@ -332,8 +419,7 @@ public class TelaCadastro extends JFrame {
 		separator.setForeground(new Color(0, 0, 0));
 		separator.setBounds(328, 162, 560, 2);
 		contentPane.add(separator);
-
-		}
+	}
 	
 	public void adicionarPlaceholder(JTextField campo, String textoPlaceholder) {
 		campo.setText(textoPlaceholder);

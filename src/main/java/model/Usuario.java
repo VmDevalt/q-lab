@@ -9,11 +9,14 @@ public class Usuario {
 	private String telefone;
 	private Perfil perfil;
 	private boolean administrador;
+	private String matricula;
 
-	public Usuario(String nome, String email, String senha, String cpf, String telefone, Perfil perfil, boolean administrador) {
+	public Usuario(String nome, String email, String senha, String matricula, String cpf, 
+		String telefone, Perfil perfil, boolean administrador) {
 		this.nome = nome;
 		this.email = email;
 		this.senha = senha;
+		this.matricula = matricula;
 		this.cpf = cpf;
 		this.telefone = telefone;
 		this.perfil = perfil;
@@ -78,6 +81,14 @@ public class Usuario {
 	public void setAdministrador(boolean administrador) {
 
 		this.administrador = administrador;
+	}
+	
+	public String getMatricula() {
+		return matricula;
+	}
+	
+	public void setMatricula(String matricula) {
+		this.matricula = matricula;
 	}
 
 }
