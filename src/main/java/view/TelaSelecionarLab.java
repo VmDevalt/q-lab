@@ -206,7 +206,6 @@ public class TelaSelecionarLab extends JFrame {
 			int row = i / 3;
 			final String cardKey = cardKeys[i];
 			
-			// Criar painel container para cada lab
 			JPanel painelLab = new JPanel();
 			painelLab.setLayout(null);
 			painelLab.setBounds(colX[col], rowY[row], 220, 250);
@@ -232,7 +231,6 @@ public class TelaSelecionarLab extends JFrame {
 				}
 			});
 			
-			// Imagem do lab
 			try {
 				ImageIcon iconLab = new ImageIcon(getClass().getResource(imagemPaths[i]));
 				Image imagemRedimensionada = iconLab.getImage().getScaledInstance(190, 110, Image.SCALE_SMOOTH);
@@ -243,14 +241,12 @@ public class TelaSelecionarLab extends JFrame {
 				System.err.println("Erro ao carregar imagem: " + imagemPaths[i]);
 			}
 			
-			// Nome do lab
 			JLabel lblNome = new JLabel(labs[i][0], SwingConstants.CENTER);
 			lblNome.setFont(new Font("Calibri", Font.BOLD, 17));
 			lblNome.setForeground(new Color(34, 139, 34));
 			lblNome.setBounds(5, 125, 210, 22);
 			painelLab.add(lblNome);
 			
-			// Descrição do lab com suporte a múltiplas linhas
 			JLabel lblDescricao = new JLabel(
 				"<html><center>" + labs[i][1] + "<br><br>" +
 				"<b>Status:</b> " + labs[i][3] + "<br>" +
@@ -346,7 +342,6 @@ public class TelaSelecionarLab extends JFrame {
 		btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		btn.setHorizontalAlignment(SwingConstants.LEFT);
 		
-		// Adicionar efeito hover com borda
 		btn.addMouseListener(new java.awt.event.MouseAdapter() {
 			@Override
 			public void mouseEntered(java.awt.event.MouseEvent e) {

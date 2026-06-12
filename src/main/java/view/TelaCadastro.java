@@ -105,7 +105,6 @@ public class TelaCadastro extends JFrame {
 					return;
 				}
 				
-				// Validação condicional baseada no perfil
 				if (comboBox.getSelectedIndex() == 0) {
 					JOptionPane.showMessageDialog(null, "Selecione um perfil!");
 					return;
@@ -115,7 +114,6 @@ public class TelaCadastro extends JFrame {
 				Perfil perfilSelecionado = perfis[comboBox.getSelectedIndex() - 1];
 				
 				if (perfilSelecionado == Perfil.PROFESSOR || perfilSelecionado == Perfil.TECNICO) {
-					// Para Técnico e Professor: 8 dígitos
 					if (!campoMatricula.getText().matches("\\d{8}")) {
 						JOptionPane.showMessageDialog(null, 
 							"Matrícula inválida! Use o formato: 12345678 (8 dígitos)",
@@ -124,7 +122,6 @@ public class TelaCadastro extends JFrame {
 						return;
 					}
 				} else if (perfilSelecionado == Perfil.ESTUDANTE_GUARDIAO) {
-					// Para Guardião: formato atual 5 dígitos + 5 letras + 4 dígitos
 					if (!campoMatricula.getText().matches("\\d{5}[A-Z]{5}\\d{4}")) {
 						JOptionPane.showMessageDialog(null, 
 							"Matrícula inválida! Use o formato: 20251ADSPL0076",
