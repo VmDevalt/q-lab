@@ -189,8 +189,8 @@ public class TelaSelecionarLab extends JFrame {
 		titulo.setBounds(0, 25, 1062, 42);
 		painel.add(titulo);
 
-		int[] colX = {631,456, 281, };
-		int[] rowY  = {401, 221};
+		int[] colX = {281, 456, 631};
+		int[] rowY  = {221, 401};
 
 		for (int i = 0; i < labs.length; i++) {
 			int col = i % 3;
@@ -273,10 +273,27 @@ public class TelaSelecionarLab extends JFrame {
 		btn.setFont(new Font("Calibri", Font.PLAIN, 13));
 		btn.setForeground(Color.WHITE);
 		btn.setBackground(new Color(27, 94, 32));
-		btn.setBorderPainted(false);
+		btn.setBorderPainted(true);
+		btn.setBorder(BorderFactory.createLineBorder(new Color(27, 94, 32), 2));
 		btn.setFocusable(false);
 		btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		btn.setHorizontalAlignment(SwingConstants.LEFT);
+		
+		// Adicionar efeito hover com borda
+		btn.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
+			public void mouseEntered(java.awt.event.MouseEvent e) {
+				btn.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+				btn.setBackground(new Color(40, 110, 45));
+			}
+			
+			@Override
+			public void mouseExited(java.awt.event.MouseEvent e) {
+				btn.setBorder(BorderFactory.createLineBorder(new Color(27, 94, 32), 2));
+				btn.setBackground(new Color(27, 94, 32));
+			}
+		});
+		
 		return btn;
 	}
 }
