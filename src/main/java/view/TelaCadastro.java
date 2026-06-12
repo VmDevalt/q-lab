@@ -135,13 +135,19 @@ public class TelaCadastro extends JFrame {
 					JOptionPane.showMessageDialog(null, "O campo Email não pode estar vazio!");
 					return;
 				}
-				if (!email.contains("@") || !email.contains(".")) {
-					JOptionPane.showMessageDialog(null, "Email inválido! Use o formato: usuario@email.com");
+				//regex email
+				if(!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+					JOptionPane.showMessageDialog(null,"Email inválido! Use o formato usuario@email.com");
 					return;
 				}
 
 				if (cpf.contains("_") || cpf.replace(".", "").replace("-", "").isBlank()) {
 					JOptionPane.showMessageDialog(null, "CPF inválido ou incompleto!");
+					return;
+				}
+				//regex cpf
+				if (!cpf.matches("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}")) {
+					JOptionPane.showMessageDialog(null, "CPF deve estar no formato 000.000.000-00!");
 					return;
 				}
 
