@@ -13,6 +13,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 import controller.CadastroController;
 import model.Perfil;
 import util.ImageUtil;
+import util.ValidarSenhaUtil;
 
 import javax.swing.JButton;
 import javax.swing.JTextField;
@@ -91,6 +92,8 @@ public class TelaCadastro extends JFrame {
 				String telefone = campoTelefone.getText();
 				char[] senha = campoSenha.getPassword();
 				char[] confirmarSenha = campoConfirmarSenha.getPassword();
+				String senhaString = new String (senha);
+				String requisitosSenha =  ValidarSenhaUtil.validarSenha(senhaString);
 
 				if (nome.isEmpty() || nome.equals("Digite seu nome")) {
 					JOptionPane.showMessageDialog(null, "O campo Nome não pode estar vazio!");
@@ -131,8 +134,8 @@ public class TelaCadastro extends JFrame {
 					JOptionPane.showMessageDialog(null, "O campo Senha não pode estar vazio!");
 					return;
 				}
-				if (senha.length < 6) {
-					JOptionPane.showMessageDialog(null, "A senha deve ter pelo menos 6 caracteres!");
+				if (requisitosSenha != "") {
+					JOptionPane.showMessageDialog(null, requisitosSenha);
 					return;
 				}
 				if (!Arrays.equals(senha, confirmarSenha)) {
