@@ -96,13 +96,19 @@ public class TelaCadastro extends JFrame {
 				String requisitosSenha =  ValidarSenhaUtil.validarSenha(senhaString);
 
 				if (nome.isEmpty() || nome.equals("Digite seu nome")) {
+					destacarBorda(campoNome);
 					JOptionPane.showMessageDialog(null, "O campo Nome não pode estar vazio!");
 					return;
+				} else {
+					restaurarBorda(campoNome);
 				}
 
 				if (matricula.isEmpty()) {
+					destacarBorda(campoMatricula);
 					JOptionPane.showMessageDialog(null, "O campo Matrícula não pode estar vazio!");
 					return;
+				} else {
+					restaurarBorda(campoMatricula);
 				}
 				
 				if (comboBox.getSelectedIndex() == 0) {
@@ -115,61 +121,104 @@ public class TelaCadastro extends JFrame {
 				
 				if (perfilSelecionado == Perfil.PROFESSOR || perfilSelecionado == Perfil.TECNICO) {
 					if (!campoMatricula.getText().matches("\\d{8}")) {
+						destacarBorda(campoMatricula);
 						JOptionPane.showMessageDialog(null, 
 							"Matrícula inválida! Use o formato: 12345678 (8 dígitos)",
 							"Erro", 
 							JOptionPane.ERROR_MESSAGE);
 						return;
+					}else {
+						restaurarBorda(campoMatricula);
 					}
+					
 				} else if (perfilSelecionado == Perfil.ESTUDANTE_GUARDIAO) {
 					if (!campoMatricula.getText().matches("\\d{5}[A-Z]{5}\\d{4}")) {
+						destacarBorda(campoMatricula);
 						JOptionPane.showMessageDialog(null, 
 							"Matrícula inválida! Use o formato: 20251ADSPL0076",
 							"Erro", 
 							JOptionPane.ERROR_MESSAGE);
 						return;
+					} else {
+						restaurarBorda(campoMatricula);
 					}
 				}
 
 				if (email.isEmpty() || email.equals("Digite seu email")) {
+					destacarBorda(campoEmail);
 					JOptionPane.showMessageDialog(null, "O campo Email não pode estar vazio!");
 					return;
+				} else {
+					restaurarBorda(campoEmail);
 				}
+				
+				
 				//regex email
 				if(!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+					destacarBorda(campoEmail);
 					JOptionPane.showMessageDialog(null,"Email inválido! Use o formato usuario@email.com");
 					return;
+				} else {
+					restaurarBorda(campoEmail);
 				}
 
 				if (cpf.contains("_") || cpf.replace(".", "").replace("-", "").isBlank()) {
+					destacarBorda(campoCpf);
 					JOptionPane.showMessageDialog(null, "CPF inválido ou incompleto!");
 					return;
+				} else {
+					restaurarBorda(campoCpf);
 				}
+				
+				
 				//regex cpf
 				if (!cpf.matches("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}")) {
+					destacarBorda(campoCpf);
 					JOptionPane.showMessageDialog(null, "CPF deve estar no formato 000.000.000-00!");
 					return;
+				} else {
+					restaurarBorda(campoCpf);
 				}
 
 				if (telefone.contains("_") || telefone.replace("(", "").replace(")", "").replace(" ", "").replace("-", "").isBlank()) {
+					destacarBorda(campoTelefone);
 					JOptionPane.showMessageDialog(null, "Telefone inválido ou incompleto!");
 					return;
+				} else {
+					restaurarBorda(campoTelefone);
 				}
 
 				if (senha.length == 0) {
+					destacarBorda(campoSenha);
 					JOptionPane.showMessageDialog(null, "O campo Senha não pode estar vazio!");
 					return;
+				} else {
+					restaurarBorda(campoSenha);
 				}
+				
 				if (requisitosSenha != "") {
+					destacarBorda(campoSenha);
 					JOptionPane.showMessageDialog(null, requisitosSenha);
 					return;
+				} else {
+					restaurarBorda(campoSenha);
 				}
+				
 				if (!Arrays.equals(senha, confirmarSenha)) {
+					destacarBorda(campoSenha);
+					destacarBorda(campoConfirmarSenha);
 					JOptionPane.showMessageDialog(null, "As senhas não coincidem!");
 					return;
+				} else {
+					restaurarBorda(campoSenha);
+					restaurarBorda(campoConfirmarSenha);
+				}
+				
+				boolean administrador = false;
+				if (perfilSelecionado == Perfil.PROFESSOR || perfilSelecionado == Perfil.TECNICO) {
+					administrador = checkBoxAdministrador.isSelected();
 				}
 
-				boolean administrador = checkBoxAdministrador.isSelected();
 
 				String hashSenha = BCrypt.with(BCrypt.Version.VERSION_2A).hashToString(12, senha);
 				Arrays.fill(senha, '\0');
@@ -182,7 +231,7 @@ public class TelaCadastro extends JFrame {
 					JOptionPane.showMessageDialog(TelaCadastro.this, "Cadastro realizado com sucesso!");
 					dispose();
 				} else {
-					JOptionPane.showMessageDialog(TelaCadastro.this, "Erro ao realizar cadastro. Verifique os dados e tente novamente.", "Erro", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(TelaCadastro.this, "Erro ao realizar cadastro.", "Erro", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -309,6 +358,17 @@ public class TelaCadastro extends JFrame {
 				campoMatricula.setText(campoMatricula.getText());
 			}
 		});
+		comboBox.addActionListener(new ActionListener() {
+			public void actionPerformed (ActionEvent e) {
+				String perfilSelecionado = (String) comboBox.getSelectedItem();
+				if (perfilSelecionado.contains("Guardião")){
+					checkBoxAdministrador.setSelected(false);
+					checkBoxAdministrador.setEnabled(false);
+				} else {
+					checkBoxAdministrador.setEnabled(true);
+				}
+			}
+		}); 		
 		contentPane.add(comboBox);
 
 		checkBoxAdministrador = new JCheckBox("Administrador");
@@ -448,12 +508,13 @@ public class TelaCadastro extends JFrame {
 				}
 			}
 		});
-		
-		
-		
-		
-		
-		
-		
+	}
+	
+	public void destacarBorda(JTextField campo) {
+		campo.setBorder(BorderFactory.createLineBorder(Color.red,3));
+	}
+	
+	public void restaurarBorda(JTextField campo) {
+		campo.setBorder(BorderFactory.createLineBorder(Color.black,2));
 	}
 }
