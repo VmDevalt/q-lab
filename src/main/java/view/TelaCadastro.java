@@ -15,20 +15,12 @@ import model.Perfil;
 import util.ImageUtil;
 import util.ValidarSenhaUtil;
 
-import javax.swing.JButton;
-import javax.swing.JTextField;
-import javax.swing.JLabel;
-import javax.swing.JComboBox;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.*;
 import java.text.ParseException;
 import java.awt.Color;
 import java.awt.Toolkit;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.util.Arrays;
 
 public class TelaCadastro extends JFrame {
@@ -325,11 +317,10 @@ public class TelaCadastro extends JFrame {
 		campoTelefone.setColumns(10);
 		campoTelefone.setBorder(BorderFactory.createLineBorder(Color.black,2));
 		
-		MaskFormatter mascaraTelefone;
 		try {
-			mascaraTelefone = new MaskFormatter("(##) #####-####");
+			MaskFormatter mascaraTelefone = new MaskFormatter("(##) #####-####");
 			mascaraTelefone.setPlaceholderCharacter('_');
-			mascaraTelefone.install(campoTelefone);
+			campoTelefone.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraTelefone));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -391,7 +382,7 @@ public class TelaCadastro extends JFrame {
 
 		campoConfirmarSenha = new JPasswordField();
 		campoConfirmarSenha.setFont(new Font("Calibri", Font.BOLD, 11));
-		campoConfirmarSenha.setBounds(713, 521, 161, 33);
+		campoConfirmarSenha.setBounds(689, 521, 161, 33);
 		contentPane.add(campoConfirmarSenha);
 
 		campoConfirmarSenha.setBorder(BorderFactory.createLineBorder(Color.black,2));
@@ -462,7 +453,7 @@ public class TelaCadastro extends JFrame {
 					btnMostrarSenha.setIcon(new ImageIcon(getClass().getResource("/images/olhoClos.png")));
 				}
 			}});
-		btnMostrarSenha.setBounds(884, 526, 21, 21);
+		btnMostrarSenha.setBounds(860, 526, 21, 21);
 		contentPane.add(btnMostrarSenha);
 		
 		JSeparator separator = new JSeparator();
@@ -478,8 +469,37 @@ public class TelaCadastro extends JFrame {
 			}
 		});
 		dicasSenha.setIcon(new ImageIcon(TelaCadastro.class.getResource("/images/dicaSenha.png")));
-		dicasSenha.setBounds(915, 526, 21, 21);
+		dicasSenha.setBounds(892, 526, 21, 21);
 		contentPane.add(dicasSenha);
+		
+		JComboBox<String> tiposTelComboBox = new JComboBox<String>();
+		tiposTelComboBox.setModel(new DefaultComboBoxModel(new String[] {"Celular", "Telefone"}));
+		tiposTelComboBox.setFont(new Font("Calibri", Font.BOLD, 13));
+		tiposTelComboBox.setBounds(760, 449, 114, 28);
+		contentPane.add(tiposTelComboBox);
+
+		tiposTelComboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				campoTelefone.setValue(null);
+				if (tiposTelComboBox.getSelectedItem().equals("Celular")) {
+					try {
+						MaskFormatter mascaraCelular = new MaskFormatter("(##) #####-####");
+						mascaraCelular.setPlaceholderCharacter('_');
+						campoTelefone.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraCelular));
+					} catch (ParseException ex) {
+						ex.printStackTrace();
+					}
+				} else {
+					try {
+						MaskFormatter mascaraTelefone = new MaskFormatter("(##) ####-####");
+						mascaraTelefone.setPlaceholderCharacter('_');
+						campoTelefone.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraTelefone));
+					} catch (ParseException ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+		});
 	}
 	
 	public void adicionarPlaceholder(JTextField campo, String textoPlaceholder) {
