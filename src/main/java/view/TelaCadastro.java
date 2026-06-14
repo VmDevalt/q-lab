@@ -336,7 +336,7 @@ public class TelaCadastro extends JFrame {
 
 		JLabel labelConfirmarSenha = new JLabel("Confirmar Senha");
 		labelConfirmarSenha.setFont(new Font("Calibri", Font.PLAIN, 18));
-		labelConfirmarSenha.setBounds(582, 519, 141, 34);
+		labelConfirmarSenha.setBounds(562, 519, 141, 34);
 		contentPane.add(labelConfirmarSenha);
 
 		JLabel labelEmail = new JLabel("Email");
@@ -451,40 +451,35 @@ public class TelaCadastro extends JFrame {
 				if (senhaVisivel){
 					campoSenha.setEchoChar('*');
 					senhaVisivel = false;
+					campoConfirmarSenha.setEchoChar('*');
+					confSenhaVisivel = false;
 					btnMostrarSenha.setIcon(new ImageIcon(getClass().getResource("/images/olho.png")));
 				} else {
 					campoSenha.setEchoChar('\0');
 					senhaVisivel = true;
+					campoConfirmarSenha.setEchoChar('\0');
+					confSenhaVisivel = true;
 					btnMostrarSenha.setIcon(new ImageIcon(getClass().getResource("/images/olhoClos.png")));
 				}
 			}});
-		btnMostrarSenha.setBounds(553, 526, 21, 21);
+		btnMostrarSenha.setBounds(884, 526, 21, 21);
 		contentPane.add(btnMostrarSenha);
-		
-		JButton btnMostrarConfSenha = new JButton("");
-		btnMostrarConfSenha.setIcon(new ImageIcon(getClass().getResource("/images/olho.png")));
-		btnMostrarConfSenha.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (confSenhaVisivel) {
-					campoConfirmarSenha.setEchoChar('*');
-					confSenhaVisivel = false;
-					btnMostrarConfSenha.setIcon(new ImageIcon(getClass().getResource("/images/olho.png")));					
-				} else {
-					campoConfirmarSenha.setEchoChar('\0');
-					confSenhaVisivel = true;
-					btnMostrarConfSenha.setIcon(new ImageIcon(getClass().getResource("/images/olhoClos.png")));
-				}
-			}
-		});
-		
-		btnMostrarConfSenha.setBounds(878, 525, 21, 21);
-		contentPane.add(btnMostrarConfSenha);
 		
 		JSeparator separator = new JSeparator();
 		separator.setBackground(new Color(255, 255, 255));
 		separator.setForeground(new Color(0, 0, 0));
-		separator.setBounds(328, 162, 560, 2);
+		separator.setBounds(281, 162, 655, 2);
 		contentPane.add(separator);
+		
+		JButton dicasSenha = new JButton("");
+		dicasSenha.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(null, "A Senha deve conter no mínimo 6 caracteres, incluindo pelo menos uma letra maiúscula, uma letra minúscula, um número e um caractere especial.");
+			}
+		});
+		dicasSenha.setIcon(new ImageIcon(TelaCadastro.class.getResource("/images/dicaSenha.png")));
+		dicasSenha.setBounds(915, 526, 21, 21);
+		contentPane.add(dicasSenha);
 	}
 	
 	public void adicionarPlaceholder(JTextField campo, String textoPlaceholder) {
