@@ -44,7 +44,6 @@ public class TelaCadastro extends JFrame {
 	private JTextField campoMatricula;
 	private JComboBox<String> comboBox;
 	private Boolean senhaVisivel = false;
-	private Boolean confSenhaVisivel = false;
 	private JCheckBox checkBoxAdministrador;
 
 	/**
@@ -225,12 +224,15 @@ public class TelaCadastro extends JFrame {
 				Arrays.fill(confirmarSenha, '\0');
 
 				CadastroController controller = new CadastroController();
-				boolean sucesso = controller.CadastrarUsuario(nome, email, matricula, cpf, telefone, hashSenha, perfilSelecionado, administrador);
+				int sucesso = controller.CadastrarUsuario(nome, email, matricula, cpf, telefone, hashSenha, perfilSelecionado, administrador);
 
-				if (sucesso) {
+				if (sucesso == 1) {
+					System.out.println(sucesso);
 					JOptionPane.showMessageDialog(TelaCadastro.this, "Cadastro realizado com sucesso!");
 					dispose();
-				} else {
+				} else if (sucesso == 2) {
+					JOptionPane.showMessageDialog(TelaCadastro.this, "O usuário já está cadastrado.", "Erro", JOptionPane.ERROR_MESSAGE);
+				}else {				
 					JOptionPane.showMessageDialog(TelaCadastro.this, "Erro ao realizar cadastro.", "Erro", JOptionPane.ERROR_MESSAGE);
 				}
 			}
