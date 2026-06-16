@@ -112,10 +112,10 @@ public class TelaCadastro extends JFrame {
 				Perfil perfilSelecionado = perfis[comboBox.getSelectedIndex() - 1];
 				
 				if (perfilSelecionado == Perfil.PROFESSOR || perfilSelecionado == Perfil.TECNICO) {
-					if (!campoMatricula.getText().matches("\\d{8}")) {
+					if (!campoMatricula.getText().matches("\\d{7,8}")) {
 						destacarBorda(campoMatricula);
 						JOptionPane.showMessageDialog(null, 
-							"Matrícula inválida! Use o formato: 12345678 (8 dígitos)",
+							"Matrícula inválida! Use 7 ou 8 dígitos numéricos.",
 							"Erro", 
 							JOptionPane.ERROR_MESSAGE);
 						return;
@@ -266,7 +266,7 @@ public class TelaCadastro extends JFrame {
 					Perfil perfilSelecionado = perfis[perfilIndex - 1];
 					
 					if (perfilSelecionado == Perfil.PROFESSOR || perfilSelecionado == Perfil.TECNICO) {
-						valido = campoMatricula.getText().matches("\\d{8}");
+						valido = campoMatricula.getText().matches("\\d{7,8}");
 					} else if (perfilSelecionado == Perfil.ESTUDANTE_GUARDIAO) {
 						valido = campoMatricula.getText().toUpperCase().matches("\\d{5}[A-Z]{5}\\d{4}");
 					}
