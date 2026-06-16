@@ -5,3 +5,4 @@ public enum Perfil {
 		TECNICO,
 		ESTUDANTE_GUARDIAO
 }
+	
