@@ -20,4 +20,11 @@ CREATE TABLE laboratorios(
 	qtd_computadores INT NOT NULL,
 	descricao VARCHAR (80) NOT NULL,
 	foto BLOB);
-
+    
+INSERT INTO laboratorios (nome, status_laboratorio, qtd_computadores, descricao) VALUES
+('Lab 01', 'LIVRE', 15, 'Redes e Manutenção'),
+('Lab 02', 'LIVRE', 15, 'Informática'),
+('Lab 03', 'LIVRE', 15, 'Desenvolvimento'),
+('Lab 05', 'LIVRE', 15, 'Sala do diretório acadêmico'),
+('Lab 06', 'LIVRE', 15, 'Prática de IA'),
+('Lab 07', 'LIVRE', 15, 'Informática 2');
