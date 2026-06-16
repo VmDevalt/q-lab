@@ -8,7 +8,7 @@ CREATE TABLE usuarios(
     email VARCHAR (50) NOT NULL,
     telefone VARCHAR(15) NOT NULL,
     senha VARCHAR(60) NOT NULL,
-    perfil ENUM ('ADMINISTRADOR', 'PROFESSOR', 'TECNICO', 'GUARDIAO'),
+    perfil ENUM ('ADMINISTRADOR', 'PROFESSOR', 'TECNICO', 'Estudante_GUARDIAO'),
     administrador BOOLEAN DEFAULT FALSE,
     CHECK (email LIKE ("%@%")),
     CHECK (CHAR_LENGTH(telefone) = 15));
@@ -18,8 +18,7 @@ CREATE TABLE laboratorios(
 	nome VARCHAR (20) NOT NULL,
 	status_laboratorio ENUM ('INTERDITADO', 'LIVRE', 'EM USO') NOT NULL,
 	qtd_computadores INT NOT NULL,
-	descricao VARCHAR (80) NOT NULL,
-	foto BLOB);
+	descricao VARCHAR (80) NOT NULL);
     
 INSERT INTO laboratorios (nome, status_laboratorio, qtd_computadores, descricao) VALUES
 ('Lab 01', 'LIVRE', 15, 'Redes e Manutenção'),
@@ -28,3 +27,6 @@ INSERT INTO laboratorios (nome, status_laboratorio, qtd_computadores, descricao)
 ('Lab 05', 'LIVRE', 15, 'Sala do diretório acadêmico'),
 ('Lab 06', 'LIVRE', 15, 'Prática de IA'),
 ('Lab 07', 'LIVRE', 15, 'Informática 2');
+	descricao VARCHAR (80) NOT NULL
+	);
+
