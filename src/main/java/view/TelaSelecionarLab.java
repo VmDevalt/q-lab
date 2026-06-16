@@ -73,33 +73,33 @@ public class TelaSelecionarLab extends JFrame {
 		lblLabs.setBounds(12, 8, 160, 14);
 		painelNav.add(lblLabs);
 		
-		JButton btnLab01 = criarBotaoMenu("Lab 01");
-		btnLab01.setBounds(4, 26, 170, 32);
+		JButton btnLab01 = criarBotaoMenu("Lab 01", "Redes e Manutenção");
+		btnLab01.setBounds(4, 26, 170, 46);
 		btnLab01.addActionListener(e -> cardLayout.show(painelConteudo, "LAB01"));
 		painelNav.add(btnLab01);
 		
-		JButton btnLab02 = criarBotaoMenu("Lab 02");
-		btnLab02.setBounds(4, 64, 170, 32);
+		JButton btnLab02 = criarBotaoMenu("Lab 02", "Informática");
+		btnLab02.setBounds(4, 78, 170, 46);
 		btnLab02.addActionListener(e -> cardLayout.show(painelConteudo, "LAB02"));
 		painelNav.add(btnLab02);
 
-		JButton btnLab03 = criarBotaoMenu("Lab 03");
-		btnLab03.setBounds(4, 102, 170, 32);
+		JButton btnLab03 = criarBotaoMenu("Lab 03", "Desenvolvimento");
+		btnLab03.setBounds(4, 130, 170, 46);
 		btnLab03.addActionListener(e -> cardLayout.show(painelConteudo, "LAB03"));
 		painelNav.add(btnLab03);
 
-		JButton btnLab05 = criarBotaoMenu("Lab 05");
-		btnLab05.setBounds(4, 140, 170, 32);
+		JButton btnLab05 = criarBotaoMenu("Lab 05", "Diretório ADS");
+		btnLab05.setBounds(4, 182, 170, 46);
 		btnLab05.addActionListener(e -> cardLayout.show(painelConteudo, "LAB05"));
 		painelNav.add(btnLab05);
 
-		JButton btnLab06 = criarBotaoMenu("Lab 06");
-		btnLab06.setBounds(4, 178, 170, 32);
+		JButton btnLab06 = criarBotaoMenu("Lab 06", "Prática de IA");
+		btnLab06.setBounds(4, 234, 170, 46);
 		btnLab06.addActionListener(e -> cardLayout.show(painelConteudo, "LAB06"));
 		painelNav.add(btnLab06);
 		
-		JButton btnLab07 = criarBotaoMenu("Lab 07");
-		btnLab07.setBounds(4, 216, 170, 32);
+		JButton btnLab07 = criarBotaoMenu("Lab 07", "Informática 2");
+		btnLab07.setBounds(4, 286, 170, 46);
 		btnLab07.addActionListener(e -> cardLayout.show(painelConteudo, "LAB07"));
 		painelNav.add(btnLab07);
 
@@ -109,29 +109,29 @@ public class TelaSelecionarLab extends JFrame {
 		JLabel lblAdmin = new JLabel("ADMINISTRAÇÃO");
 		lblAdmin.setFont(new Font("Calibri", Font.BOLD, 10));
 		lblAdmin.setForeground(new Color(165, 214, 167));
-		lblAdmin.setBounds(12, 265, 160, 14);
+		lblAdmin.setBounds(12, 345, 160, 14);
 		lblAdmin.setVisible(isAdmin);
 		painelNav.add(lblAdmin);
 
 		JButton btnDashboard = criarBotaoMenu("Dashboard");
-		btnDashboard.setBounds(4, 283, 170, 32);
+		btnDashboard.setBounds(4, 363, 170, 32);
 		btnDashboard.addActionListener(e -> cardLayout.show(painelConteudo, "DASHBOARD"));
 		btnDashboard.setVisible(isAdmin);
 		painelNav.add(btnDashboard);
 
 		JButton btnCadastrar = criarBotaoMenu("Cadastrar");
-		btnCadastrar.setBounds(4, 321, 170, 32);
+		btnCadastrar.setBounds(4, 401, 170, 32);
 		btnCadastrar.addActionListener(e -> new TelaCadastro().setVisible(true));
 		btnCadastrar.setVisible(isAdmin);
 		painelNav.add(btnCadastrar);
 
 		JButton btnInterditar = criarBotaoMenu("Interditar");
-		btnInterditar.setBounds(4, 359, 170, 32);
+		btnInterditar.setBounds(4, 439, 170, 32);
 		btnInterditar.addActionListener(e -> cardLayout.show(painelConteudo, "INTERDITAR"));
 		btnInterditar.setVisible(isAdmin);
 		painelNav.add(btnInterditar);
 
-		painelNav.setPreferredSize(new Dimension(175, 405));
+		painelNav.setPreferredSize(new Dimension(175, 485));
 
 		JScrollPane scrollNav = new JScrollPane(painelNav,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -157,7 +157,7 @@ public class TelaSelecionarLab extends JFrame {
 		contentPane.add(painelConteudo);
 
 		String[][] labs = {
-			{"Lab 01", "Redes",           "Térreo",     "Ativo",      "15"},
+			{"Lab 01", "Redes e Manutenção", "Térreo",     "Ativo",      "15"},
 			{"Lab 02", "Informática",     "Térreo",     "Ativo",      "20"},
 			{"Lab 03", "Desenvolvimento", "Térreo",     "Ativo",      "18"},
 			{"Lab 05", "Sala do Diretório Acadêmico - ADS", "1° Andar", "Ativo", "12"},
@@ -190,16 +190,7 @@ public class TelaSelecionarLab extends JFrame {
 		painel.add(titulo);
 
 		int[] colX = {100, 420, 740};
-		int[] rowY  = {100, 370};
-		
-		String[] imagemPaths = {
-			"/images/lab1.png",
-			"/images/lab2.jpeg", 
-			"/images/lab3.jpeg",
-			"/images/lab5.jpeg",
-			"/images/lab6.jpeg",
-			"/images/lab7.jpeg"
-		};
+		int[] rowY  = {150, 390};
 
 		for (int i = 0; i < labs.length; i++) {
 			int col = i % 3;
@@ -208,7 +199,7 @@ public class TelaSelecionarLab extends JFrame {
 			
 			JPanel painelLab = new JPanel();
 			painelLab.setLayout(null);
-			painelLab.setBounds(colX[col], rowY[row], 220, 250);
+			painelLab.setBounds(colX[col], rowY[row], 220, 170);
 			painelLab.setBackground(Color.WHITE);
 			painelLab.setBorder(BorderFactory.createLineBorder(new Color(34, 139, 34), 2));
 			painelLab.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -231,20 +222,10 @@ public class TelaSelecionarLab extends JFrame {
 				}
 			});
 			
-			try {
-				ImageIcon iconLab = new ImageIcon(getClass().getResource(imagemPaths[i]));
-				Image imagemRedimensionada = iconLab.getImage().getScaledInstance(190, 110, Image.SCALE_SMOOTH);
-				JLabel lblImagem = new JLabel(new ImageIcon(imagemRedimensionada));
-				lblImagem.setBounds(15, 10, 190, 110);
-				painelLab.add(lblImagem);
-			} catch (Exception e) {
-				System.err.println("Erro ao carregar imagem: " + imagemPaths[i]);
-			}
-			
 			JLabel lblNome = new JLabel(labs[i][0], SwingConstants.CENTER);
-			lblNome.setFont(new Font("Calibri", Font.BOLD, 17));
+			lblNome.setFont(new Font("Calibri", Font.BOLD, 18));
 			lblNome.setForeground(new Color(34, 139, 34));
-			lblNome.setBounds(5, 125, 210, 22);
+			lblNome.setBounds(5, 20, 210, 25);
 			painelLab.add(lblNome);
 			
 			JLabel lblDescricao = new JLabel(
@@ -253,9 +234,9 @@ public class TelaSelecionarLab extends JFrame {
 				"<b>Computadores:</b> " + labs[i][4] + "</center></html>",
 				SwingConstants.CENTER
 			);
-			lblDescricao.setFont(new Font("Calibri", Font.PLAIN, 12));
+			lblDescricao.setFont(new Font("Calibri", Font.PLAIN, 13));
 			lblDescricao.setForeground(Color.GRAY);
-			lblDescricao.setBounds(5, 150, 210, 90);
+			lblDescricao.setBounds(5, 55, 210, 95);
 			painelLab.add(lblDescricao);
 			
 			painel.add(painelLab);
@@ -333,6 +314,38 @@ public class TelaSelecionarLab extends JFrame {
 
 	private JButton criarBotaoMenu(String texto) {
 		JButton btn = new JButton("  " + texto);
+		btn.setFont(new Font("Calibri", Font.PLAIN, 13));
+		btn.setForeground(Color.WHITE);
+		btn.setBackground(new Color(27, 94, 32));
+		btn.setBorderPainted(true);
+		btn.setBorder(BorderFactory.createLineBorder(new Color(27, 94, 32), 2));
+		btn.setFocusable(false);
+		btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		btn.setHorizontalAlignment(SwingConstants.LEFT);
+		
+		btn.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
+			public void mouseEntered(java.awt.event.MouseEvent e) {
+				btn.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+				btn.setBackground(new Color(40, 110, 45));
+			}
+			
+			@Override
+			public void mouseExited(java.awt.event.MouseEvent e) {
+				btn.setBorder(BorderFactory.createLineBorder(new Color(27, 94, 32), 2));
+				btn.setBackground(new Color(27, 94, 32));
+			}
+		});
+		
+		return btn;
+	}
+
+	private JButton criarBotaoMenu(String texto, String descricao) {
+		String htmlTexto = "<html><div style='padding-left: 5px;'>"
+				+ "<b>" + texto + "</b><br>"
+				+ "<font size='2' color='#a5d6a7'>" + descricao + "</font>"
+				+ "</div></html>";
+		JButton btn = new JButton(htmlTexto);
 		btn.setFont(new Font("Calibri", Font.PLAIN, 13));
 		btn.setForeground(Color.WHITE);
 		btn.setBackground(new Color(27, 94, 32));
