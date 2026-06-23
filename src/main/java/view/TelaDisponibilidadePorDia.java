@@ -10,12 +10,14 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
@@ -177,19 +179,36 @@ public class TelaDisponibilidadePorDia extends JFrame {
 
 		String[] colunas = {"", "Lab 1", "Lab 2", "Lab 3", "Lab 5", "Lab 6", "Lab 7"};
 		String[] horarios = {"M1", "M2", "M3", "M4", "M5", "M6", "T1", "T2", "T3", "T4", "T5", "T6", "N1", "N2", "N3", "N4", "N5", "N6"};
-
-		DefaultTableModel modelo = new DefaultTableModel(colunas, 0);
+		
+		
+		DefaultTableModel tabelaHorarios = new DefaultTableModel(colunas, 0);
 
 		for (String horario : horarios) {
-		    modelo.addRow(new Object[]{horario, "", "", "", "", "", ""});
+			tabelaHorarios.addRow(new Object[]{horario, "", "", "", "", "", ""});
 		}
 
-		tabelaLaboratorios = new JTable(modelo);
+		tabelaLaboratorios = new JTable(tabelaHorarios);
 		tabelaLaboratorios.setRowHeight(50);
 		tabelaLaboratorios.setFont(new Font("Calibri", Font.PLAIN, 18));
 		tabelaLaboratorios.getTableHeader().setFont(new Font("Calibri", Font.BOLD, 16));
 		
 		tabelaLaboratorios.setDefaultRenderer(Object.class, new ColorRenderer());
+		tabelaLaboratorios.addMouseListener(new java.awt.event.MouseAdapter() {
+			public void mouseClicked(MouseEvent e){
+				String[] opcoesReserva = {"Reservar", "Cancelar", "Interditar"};
+				int linha = tabelaLaboratorios.rowAtPoint(e.getPoint());
+				int coluna = tabelaLaboratorios.columnAtPoint(e.getPoint());
+				var opcao = JOptionPane.showOptionDialog(null, "Deseja reservar?", "Reserva de horário", 2, 1, null, opcoesReserva, null);
+				
+				if (opcao == 0) {
+					tabelaLaboratorios.setValueAt("OCUPADO", linha, coluna);
+				} else if (opcao == 1) {
+					tabelaLaboratorios.setValueAt("", linha, coluna);
+				} else if (opcao == 2) {
+					tabelaLaboratorios.setValueAt("INTERDITADO", linha, coluna);
+				}
+			}
+		});
 		
 		scrollPaneTabela.setViewportView(tabelaLaboratorios);
 		
@@ -371,16 +390,22 @@ public class TelaDisponibilidadePorDia extends JFrame {
 	}
 	
 	class ColorRenderer extends DefaultTableCellRenderer{
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public Component getTableCellRendererComponent (JTable tabela, Object disponibilidade, boolean isSelected, boolean hasFocus, int coluna, int linha) {
 			super.getTableCellRendererComponent(tabela, disponibilidade, isSelected, hasFocus, linha, coluna);
 			setHorizontalAlignment(SwingConstants.CENTER);
-			if (disponibilidade.toString().equals("LIVRE")) {
-				setBackground(Color.GREEN);
+			Color verde = new Color(126, 217, 87);
+			Color vermelho = new Color(255, 82, 82);
+			Color cinza = new Color(180, 180, 180);
+			
+			if (disponibilidade.toString().equals("")) {
+				setBackground(verde);
 			} else if (disponibilidade.toString().equals("INTERDITADO")) {
-				setBackground(Color.GRAY);
+				setBackground(cinza);
 			} else if (disponibilidade.toString().equals("OCUPADO")){
-				setBackground(Color.RED);
+				setBackground(vermelho);
 			} else {
 				setBackground(Color.white);
 			}
@@ -388,4 +413,4 @@ public class TelaDisponibilidadePorDia extends JFrame {
 			return this;
 		}
 	}
-			}
+}
