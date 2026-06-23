@@ -198,9 +198,14 @@ public class TelaDisponibilidadePorDia extends JFrame {
 				String[] opcoesReserva = {"Reservar", "Cancelar", "Interditar"};
 				int linha = tabelaLaboratorios.rowAtPoint(e.getPoint());
 				int coluna = tabelaLaboratorios.columnAtPoint(e.getPoint());
-				var opcao = JOptionPane.showOptionDialog(null, "Deseja reservar?", "Reserva de horário", 2, 1, null, opcoesReserva, null);
+				String usuario = 
+				
+				var opcao = JOptionPane.showOptionDialog(null, "O que você deseja fazer?", "Reserva de horário", 2, 1, null, opcoesReserva, null);
 				
 				if (opcao == 0) {
+					String disciplina = JOptionPane.showInputDialog("Disciplina: ");
+					
+					
 					tabelaLaboratorios.setValueAt("OCUPADO", linha, coluna);
 				} else if (opcao == 1) {
 					tabelaLaboratorios.setValueAt("", linha, coluna);
