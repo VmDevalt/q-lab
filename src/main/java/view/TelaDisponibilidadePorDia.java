@@ -198,6 +198,7 @@ public class TelaDisponibilidadePorDia extends JFrame {
 				String[] opcoesReserva = {"Reservar", "Cancelar", "Interditar"};
 				int linha = tabelaLaboratorios.rowAtPoint(e.getPoint());
 				int coluna = tabelaLaboratorios.columnAtPoint(e.getPoint());
+				//TO DO Recuperar usuario
 				//String usuario = 
 
 				var opcao = JOptionPane.showOptionDialog(null, "O que você deseja fazer?", "Reserva de horário", 2, 1, null, opcoesReserva, null);
