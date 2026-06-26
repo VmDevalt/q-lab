@@ -429,13 +429,11 @@ public class TelaCadastro extends JFrame {
 					campoSenha.setEchoChar('*');
 					senhaVisivel = false;
 					campoConfirmarSenha.setEchoChar('*');
-					confSenhaVisivel = false;
 					btnMostrarSenha.setIcon(new ImageIcon(getClass().getResource("/images/olho.png")));
 				} else {
 					campoSenha.setEchoChar('\0');
 					senhaVisivel = true;
 					campoConfirmarSenha.setEchoChar('\0');
-					confSenhaVisivel = true;
 					btnMostrarSenha.setIcon(new ImageIcon(getClass().getResource("/images/olhoClos.png")));
 				}
 			}});
