@@ -1,18 +1,13 @@
 package controller;
 
-import dao.UsuarioDao;
 import model.Usuario;
+import repository.UsuarioRepository;
 
 public class LoginController {
-	
-	public Usuario  logarUsuario(String matricula, String hashSenha) throws Exception{
-		
-			UsuarioDao dao = new UsuarioDao();
-            Usuario usuario = dao.login(matricula, hashSenha);
-            
-           if (usuario == null) {
-                 throw new Exception("Matrícula ou senha incorretos.");
-           }
-		return usuario;
-	}
+
+    private final UsuarioRepository repository = new UsuarioRepository();
+
+    public Usuario logarUsuario(String matricula, String senha) throws Exception {
+        return repository.autenticar(matricula, senha);
+    }
 }

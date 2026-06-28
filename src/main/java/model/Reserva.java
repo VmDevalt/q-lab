@@ -1,61 +1,33 @@
 package model;
 
-import java.sql.Date;
-
 public class Reserva {
-	int idReserva;
-	int horarioId;
-	int usuarioId;
-	Date dataReserva; 
-	String disciplina;
-	
-	public Reserva (int idReserva, int horarioId, int usuarioId, Date dataReserva, String disciplina) {
-		this.idReserva = idReserva;
-		this.horarioId = horarioId;
-		this.usuarioId = usuarioId;
-		this.dataReserva = dataReserva;
-		this.disciplina = disciplina;
-	}
-	
-	public int getIdReserva() {
-		return idReserva;
-	}
-	
-	public void setIdReserva(int idReserva) {
-		this.idReserva = idReserva;
-	}
 
-	public int getHorarioId() {
-		return horarioId;
-	}
+    private int idReserva;
+    private Horario horario;
+    private String matricula;
+    private String disciplina;
+    private StatusReserva status;
 
-	public void setHorarioId(int horarioId) {
-		this.horarioId = horarioId;
-	}
+    public Reserva(int idReserva, Horario horario, String matricula, String disciplina, StatusReserva status) {
+        this.idReserva = idReserva;
+        this.horario = horario;
+        this.matricula = matricula;
+        this.disciplina = disciplina;
+        this.status = status;
+    }
 
-	public int getUsuarioId() {
-		return usuarioId;
-	}
+    public int getIdReserva() { return idReserva; }
+    public void setIdReserva(int idReserva) { this.idReserva = idReserva; }
 
-	public void setUsuarioId(int usuarioId) {
-		this.usuarioId = usuarioId;
-	}
+    public Horario getHorario() { return horario; }
+    public void setHorario(Horario horario) { this.horario = horario; }
 
-	public Date getDataReserva() {
-		return dataReserva;
-	}
+    public String getMatricula() { return matricula; }
+    public void setMatricula(String matricula) { this.matricula = matricula; }
 
-	public void setDataReserva(Date dataReserva) {
-		this.dataReserva = dataReserva;
-	}
+    public String getDisciplina() { return disciplina; }
+    public void setDisciplina(String disciplina) { this.disciplina = disciplina; }
 
-	public String getDisciplina() {
-		return disciplina;
-	}
-
-	public void setDisciplina(String disciplina) {
-		this.disciplina = disciplina;
-	}
-	
-
+    public StatusReserva getStatus() { return status; }
+    public void setStatus(StatusReserva status) { this.status = status; }
 }

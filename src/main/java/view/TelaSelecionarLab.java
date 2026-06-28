@@ -14,10 +14,26 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.sql.Date;
+import java.util.List;
+
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+
+import controller.InterdicaoController;
+import controller.LaboratorioController;
+import controller.ReservaController;
+import model.HorariosEnum;
+import model.Laboratorio;
+import model.Reserva;
 import model.Usuario;
 
 public class TelaSelecionarLab extends JFrame {
@@ -25,6 +41,11 @@ public class TelaSelecionarLab extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel painelConteudo;
 	private CardLayout cardLayout;
+
+	private final LaboratorioController labCtrl = new LaboratorioController();
+	private final InterdicaoController interdicaoCtrl = new InterdicaoController();
+	private final ReservaController reservaCtrl = new ReservaController();
+	private Usuario usuarioLogado;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(() -> {
@@ -37,6 +58,7 @@ public class TelaSelecionarLab extends JFrame {
 	}
 
 	public TelaSelecionarLab(Usuario usuarioLogado) {
+		this.usuarioLogado = usuarioLogado;
 
 		setIconImage(Toolkit.getDefaultToolkit().getImage(
 				getClass().getResource("/images/logo_qlab_pequena_branca.png")));
@@ -131,7 +153,23 @@ public class TelaSelecionarLab extends JFrame {
 		btnInterditar.setVisible(isAdmin);
 		painelNav.add(btnInterditar);
 
-		painelNav.setPreferredSize(new Dimension(175, 485));
+		JButton btnEditarUsuario = criarBotaoMenu("Editar Usuário");
+		btnEditarUsuario.setBounds(4, 477, 170, 32);
+		btnEditarUsuario.addActionListener(e -> {
+			String matricula = JOptionPane.showInputDialog(this, "Informe a matrícula do usuário:", "Editar Usuário", JOptionPane.PLAIN_MESSAGE);
+			if (matricula == null || matricula.trim().isEmpty()) return;
+			controller.CadastroController ctrl = new controller.CadastroController();
+			model.Usuario u = ctrl.buscarUsuario(matricula.trim());
+			if (u == null) {
+				JOptionPane.showMessageDialog(this, "Usuário não encontrado.", "Aviso", JOptionPane.WARNING_MESSAGE);
+			} else {
+				new TelaCadastro(u).setVisible(true);
+			}
+		});
+		btnEditarUsuario.setVisible(isAdmin);
+		painelNav.add(btnEditarUsuario);
+
+		painelNav.setPreferredSize(new Dimension(175, 523));
 
 		JScrollPane scrollNav = new JScrollPane(painelNav,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -156,30 +194,24 @@ public class TelaSelecionarLab extends JFrame {
 		painelConteudo.setBackground(Color.WHITE);
 		contentPane.add(painelConteudo);
 
-		String[][] labs = {
-			{"Lab 01", "Redes e Manutenção", "Térreo",     "Ativo",      "15"},
-			{"Lab 02", "Informática",     "Térreo",     "Ativo",      "20"},
-			{"Lab 03", "Desenvolvimento", "Térreo",     "Ativo",      "18"},
-			{"Lab 05", "Sala do Diretório Acadêmico - ADS", "1° Andar", "Ativo", "12"},
-			{"Lab 06", "Prática de IA",   "1° Andar",   "Ativo",      "16"},
-			{"Lab 07", "Informática 2",   "1° Andar",   "Ativo",      "22"},
-		};
-		String[] cardKeys = {"LAB01", "LAB02", "LAB03", "LAB05", "LAB06",  "LAB07"};
+		List<Laboratorio> laboratorios = labCtrl.listarLaboratorios();
+		Date hoje = new Date(System.currentTimeMillis());
+		String[] cardKeys = {"LAB01", "LAB02", "LAB03", "LAB05", "LAB06", "LAB07"};
 
-		painelConteudo.add(criarPainelGridLabs(labs, cardKeys), "LABS");
+		painelConteudo.add(criarPainelGridLabs(laboratorios, cardKeys, hoje), "LABS");
 
-		for (int i = 0; i < labs.length; i++) {
-			painelConteudo.add(criarPainelLab(labs[i]), cardKeys[i]);
+		for (int i = 0; i < laboratorios.size() && i < cardKeys.length; i++) {
+			painelConteudo.add(criarPainelLab(laboratorios.get(i)), cardKeys[i]);
 		}
 
-		painelConteudo.add(criarPainelPlaceholder("Dashboard"),             "DASHBOARD");
-		painelConteudo.add(criarPainelPlaceholder("Interditar Laboratório"), "INTERDITAR");
+		painelConteudo.add(criarPainelDashboard(),                            "DASHBOARD");
+		painelConteudo.add(criarPainelPlaceholder("Interditar Laboratório"),  "INTERDITAR");
 
 		cardLayout.show(painelConteudo, "LABS");
 	}
 
 
-	private JPanel criarPainelGridLabs(String[][] labs, String[] cardKeys) {
+	private JPanel criarPainelGridLabs(List<Laboratorio> labs, String[] cardKeys, Date hoje) {
 		JPanel painel = new JPanel();
 		painel.setBackground(Color.WHITE);
 		painel.setLayout(null);
@@ -192,60 +224,62 @@ public class TelaSelecionarLab extends JFrame {
 		int[] colX = {100, 420, 740};
 		int[] rowY  = {150, 390};
 
-		for (int i = 0; i < labs.length; i++) {
+		for (int i = 0; i < labs.size() && i < cardKeys.length; i++) {
+			Laboratorio lab = labs.get(i);
 			int col = i % 3;
 			int row = i / 3;
 			final String cardKey = cardKeys[i];
-			
+
+			boolean interditado = interdicaoCtrl.isInterditado(lab.getId(), hoje);
+			String statusTxt = interditado ? "Interditado" : "Disponível";
+			Color statusCor  = interditado ? new Color(180, 0, 0) : new Color(34, 139, 34);
+			Color bordaCor   = interditado ? new Color(180, 0, 0) : new Color(34, 139, 34);
+
 			JPanel painelLab = new JPanel();
 			painelLab.setLayout(null);
 			painelLab.setBounds(colX[col], rowY[row], 220, 170);
 			painelLab.setBackground(Color.WHITE);
-			painelLab.setBorder(BorderFactory.createLineBorder(new Color(34, 139, 34), 2));
+			painelLab.setBorder(BorderFactory.createLineBorder(bordaCor, 2));
 			painelLab.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			painelLab.addMouseListener(new java.awt.event.MouseAdapter() {
-				@Override
-				public void mouseEntered(java.awt.event.MouseEvent e) {
+				@Override public void mouseEntered(java.awt.event.MouseEvent e) {
 					painelLab.setBackground(new Color(240, 245, 240));
-					painelLab.setBorder(BorderFactory.createLineBorder(new Color(34, 139, 34), 3));
+					painelLab.setBorder(BorderFactory.createLineBorder(bordaCor, 3));
 				}
-				
-				@Override
-				public void mouseExited(java.awt.event.MouseEvent e) {
+				@Override public void mouseExited(java.awt.event.MouseEvent e) {
 					painelLab.setBackground(Color.WHITE);
-					painelLab.setBorder(BorderFactory.createLineBorder(new Color(34, 139, 34), 2));
+					painelLab.setBorder(BorderFactory.createLineBorder(bordaCor, 2));
 				}
-				
-				@Override
-				public void mouseClicked(java.awt.event.MouseEvent e) {
+				@Override public void mouseClicked(java.awt.event.MouseEvent e) {
 					cardLayout.show(painelConteudo, cardKey);
 				}
 			});
-			
-			JLabel lblNome = new JLabel(labs[i][0], SwingConstants.CENTER);
+
+			JLabel lblNome = new JLabel(lab.getNome(), SwingConstants.CENTER);
 			lblNome.setFont(new Font("Calibri", Font.BOLD, 18));
-			lblNome.setForeground(new Color(34, 139, 34));
-			lblNome.setBounds(5, 20, 210, 25);
+			lblNome.setForeground(statusCor);
+			lblNome.setBounds(5, 15, 210, 25);
 			painelLab.add(lblNome);
-			
+
 			JLabel lblDescricao = new JLabel(
-				"<html><center>" + labs[i][1] + "<br><br>" +
-				"<b>Status:</b> " + labs[i][3] + "<br>" +
-				"<b>Computadores:</b> " + labs[i][4] + "</center></html>",
+				"<html><center>" + lab.getDescricao() + "<br>"
+				+ lab.getAndar() + "<br><br>"
+				+ "<b>Status:</b> " + statusTxt + "<br>"
+				+ "<b>Computadores:</b> " + lab.getCapacidade() + "</center></html>",
 				SwingConstants.CENTER
 			);
-			lblDescricao.setFont(new Font("Calibri", Font.PLAIN, 13));
+			lblDescricao.setFont(new Font("Calibri", Font.PLAIN, 12));
 			lblDescricao.setForeground(Color.GRAY);
-			lblDescricao.setBounds(5, 55, 210, 95);
+			lblDescricao.setBounds(5, 48, 210, 108);
 			painelLab.add(lblDescricao);
-			
+
 			painel.add(painelLab);
 		}
 
 		return painel;
 	}
 
-	private JPanel criarPainelLab(String[] lab) {
+	private JPanel criarPainelLab(Laboratorio lab) {
 		JPanel painel = new JPanel();
 		painel.setBackground(Color.WHITE);
 		painel.setLayout(null);
@@ -261,36 +295,159 @@ public class TelaSelecionarLab extends JFrame {
 		btnVoltar.addActionListener(e -> cardLayout.show(painelConteudo, "LABS"));
 		painel.add(btnVoltar);
 
-		JLabel titulo = new JLabel(lab[0] + " – " + lab[1], SwingConstants.CENTER);
+		JLabel titulo = new JLabel(lab.getNome() + " – " + lab.getDescricao(), SwingConstants.CENTER);
 		titulo.setFont(new Font("Calibri", Font.PLAIN, 32));
 		titulo.setBounds(0, 25, 1062, 42);
 		painel.add(titulo);
 
-		JLabel andar = new JLabel(lab[2], SwingConstants.CENTER);
+		JLabel andar = new JLabel(lab.getAndar(), SwingConstants.CENTER);
 		andar.setFont(new Font("Calibri", Font.ITALIC, 16));
 		andar.setForeground(Color.GRAY);
 		andar.setBounds(0, 75, 1062, 25);
 		painel.add(andar);
 
-		JLabel lblStatus = new JLabel("Status: " + lab[3], SwingConstants.CENTER);
-		lblStatus.setFont(new Font("Calibri", Font.PLAIN, 14));
-		lblStatus.setForeground(new Color(34, 139, 34));
-		lblStatus.setBounds(0, 120, 1062, 25);
-		painel.add(lblStatus);
-
-		JLabel lblComputadores = new JLabel("Computadores funcionando: " + lab[4], SwingConstants.CENTER);
+		JLabel lblComputadores = new JLabel("Computadores: " + lab.getCapacidade(), SwingConstants.CENTER);
 		lblComputadores.setFont(new Font("Calibri", Font.PLAIN, 14));
 		lblComputadores.setForeground(Color.GRAY);
-		lblComputadores.setBounds(0, 155, 1062, 25);
+		lblComputadores.setBounds(0, 110, 1062, 25);
 		painel.add(lblComputadores);
 
-		JLabel placeholder = new JLabel("Detalhes do laboratório em desenvolvimento", SwingConstants.CENTER);
-		placeholder.setFont(new Font("Calibri", Font.ITALIC, 14));
-		placeholder.setForeground(new Color(190, 190, 190));
-		placeholder.setBounds(0, 330, 1062, 25);
-		painel.add(placeholder);
+		JButton btnVerDisponibilidade = new JButton("Ver Disponibilidade →");
+		btnVerDisponibilidade.setFont(new Font("Calibri", Font.PLAIN, 14));
+		btnVerDisponibilidade.setForeground(Color.WHITE);
+		btnVerDisponibilidade.setBackground(new Color(34, 139, 34));
+		btnVerDisponibilidade.setBounds(431, 200, 200, 36);
+		btnVerDisponibilidade.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		btnVerDisponibilidade.setFocusable(false);
+		btnVerDisponibilidade.addActionListener(e -> {
+			dispose();
+			new TelaDisponibilidadePorDia(usuarioLogado).setVisible(true);
+		});
+		painel.add(btnVerDisponibilidade);
 
 		return painel;
+	}
+
+	private JPanel criarPainelDashboard() {
+		JPanel painel = new JPanel(null);
+		painel.setBackground(Color.WHITE);
+
+		JLabel titulo = new JLabel("Dashboard", SwingConstants.CENTER);
+		titulo.setFont(new Font("Calibri", Font.PLAIN, 30));
+		titulo.setBounds(0, 18, 1062, 40);
+		painel.add(titulo);
+
+		int[] cardsX = {60, 290, 520, 750};
+		String[] cardsLabel = {"Laboratórios", "Interditados", "Reservas hoje", "Labs c/ reserva"};
+		Color[] cardsCor = {
+			new Color(27, 94, 32),
+			new Color(183, 28, 28),
+			new Color(13, 71, 161),
+			new Color(230, 81, 0)
+		};
+
+		JLabel[] valoresCards = new JLabel[4];
+		for (int i = 0; i < 4; i++) {
+			JPanel card = new JPanel(null);
+			card.setBounds(cardsX[i], 68, 200, 100);
+			card.setBackground(Color.WHITE);
+			card.setBorder(BorderFactory.createLineBorder(cardsCor[i], 2));
+
+			JLabel lblValor = new JLabel("–", SwingConstants.CENTER);
+			lblValor.setFont(new Font("Calibri", Font.BOLD, 40));
+			lblValor.setForeground(cardsCor[i]);
+			lblValor.setBounds(0, 10, 200, 50);
+			card.add(lblValor);
+			valoresCards[i] = lblValor;
+
+			JLabel lblTitulo = new JLabel(cardsLabel[i], SwingConstants.CENTER);
+			lblTitulo.setFont(new Font("Calibri", Font.PLAIN, 13));
+			lblTitulo.setForeground(Color.GRAY);
+			lblTitulo.setBounds(0, 62, 200, 25);
+			card.add(lblTitulo);
+
+			painel.add(card);
+		}
+
+		JLabel lblTabTitulo = new JLabel("Reservas de hoje", SwingConstants.LEFT);
+		lblTabTitulo.setFont(new Font("Calibri", Font.BOLD, 16));
+		lblTabTitulo.setForeground(new Color(27, 94, 32));
+		lblTabTitulo.setBounds(28, 182, 300, 25);
+		painel.add(lblTabTitulo);
+
+		DefaultTableModel dashModel = new DefaultTableModel(
+				new String[]{"Lab", "Horário", "Período", "Matrícula", "Disciplina"}, 0) {
+			private static final long serialVersionUID = 1L;
+			@Override public boolean isCellEditable(int r, int c) { return false; }
+		};
+
+		JTable dashTable = new JTable(dashModel);
+		dashTable.setRowHeight(26);
+		dashTable.setFont(new Font("Calibri", Font.PLAIN, 13));
+		dashTable.getTableHeader().setFont(new Font("Calibri", Font.BOLD, 13));
+		dashTable.getTableHeader().setReorderingAllowed(false);
+		dashTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+			private static final long serialVersionUID = 1L;
+			@Override public java.awt.Component getTableCellRendererComponent(
+					JTable t, Object v, boolean sel, boolean foc, int r, int c) {
+				super.getTableCellRendererComponent(t, v, sel, foc, r, c);
+				setHorizontalAlignment(SwingConstants.CENTER);
+				setBackground(r % 2 == 0 ? Color.WHITE : new Color(245, 250, 245));
+				setForeground(Color.DARK_GRAY);
+				return this;
+			}
+		});
+
+		JScrollPane scroll = new JScrollPane(dashTable);
+		scroll.setBounds(28, 212, 1006, 420);
+		painel.add(scroll);
+
+		painel.addComponentListener(new ComponentAdapter() {
+			@Override public void componentShown(ComponentEvent e) {
+				carregarDashboard(dashModel, valoresCards);
+			}
+		});
+
+		return painel;
+	}
+
+	private void carregarDashboard(DefaultTableModel model, JLabel[] valoresCards) {
+		List<Laboratorio> labs = labCtrl.listarLaboratorios();
+		Date hoje = new Date(System.currentTimeMillis());
+
+		int totalLabs     = labs.size();
+		int interditados  = 0;
+		int totalReservas = 0;
+		int labsComReserva = 0;
+
+		model.setRowCount(0);
+
+		for (Laboratorio lab : labs) {
+			boolean interditado = interdicaoCtrl.isInterditado(lab.getId(), hoje);
+			if (interditado) {
+				interditados++;
+				continue;
+			}
+			List<Reserva> reservas = reservaCtrl.reservasPorLabEData(lab.getId(), hoje);
+			totalReservas += reservas.size();
+			if (!reservas.isEmpty()) labsComReserva++;
+
+			for (Reserva r : reservas) {
+				HorariosEnum slot = r.getHorario().getHorario();
+				model.addRow(new Object[]{
+					lab.getNome(),
+					slot.name(),
+					slot.getHi() + " – " + slot.getHf(),
+					r.getMatricula(),
+					r.getDisciplina()
+				});
+			}
+		}
+
+		valoresCards[0].setText(String.valueOf(totalLabs));
+		valoresCards[1].setText(String.valueOf(interditados));
+		valoresCards[2].setText(String.valueOf(totalReservas));
+		valoresCards[3].setText(String.valueOf(labsComReserva));
 	}
 
 	private JPanel criarPainelPlaceholder(String titulo) {
