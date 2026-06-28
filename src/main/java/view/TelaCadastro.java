@@ -126,7 +126,7 @@ public class TelaCadastro extends JFrame {
 					if (!campoMatricula.getText().toUpperCase().matches("\\d{5}[A-Z]{5}\\d{4}")) {
 						destacarBorda(campoMatricula);
 						JOptionPane.showMessageDialog(null, 
-							"Matrícula inválida! Use o formato: 20251ADSPL0076",
+							"Matrícula inválida! Use o formato: 202XXADSPLXXXX",
 							"Erro", 
 							JOptionPane.ERROR_MESSAGE);
 						return;
@@ -466,7 +466,7 @@ public class TelaCadastro extends JFrame {
 				if (perfilIndex > 0) {
 					Perfil perfilSelecionado = perfis[perfilIndex - 1];
 				if(perfilSelecionado == Perfil.ESTUDANTE_GUARDIAO) {
-				JOptionPane.showMessageDialog(null, "A matricula deve conter 5 numeros inicias seguidos por 5 letras(maisculas/minusculas) e por fim 4 numeros novamente.   Ex:20231adpls1234.")
+				JOptionPane.showMessageDialog(null, "A matricula deve conter 5 numeros inicias seguidos por 5 letras(maisculas/minusculas) e por fim 4 numeros novamente.   Ex:202XXADSPLXXXX.")
 				;}else {
 					JOptionPane.showMessageDialog(null, "A matricula deve conter 8 numeros.   Ex:11023456.");
 				}
