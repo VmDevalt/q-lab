@@ -144,9 +144,8 @@ public class TelaLogin extends JFrame {
 				try {
 					LoginController controller = new LoginController();
 					Usuario usuario = controller.logarUsuario(matricula, senha);
-					TelaSelecionarLab tela = new TelaSelecionarLab(usuario);
-					tela.setVisible(true);
 					dispose();
+					new TelaDisponibilidadePorDia(usuario).setVisible(true);
 				} catch (Exception ex) {
 					JOptionPane.showMessageDialog(TelaLogin.this, ex.getMessage(), "Erro de Login", JOptionPane.ERROR_MESSAGE);
 				}
