@@ -38,6 +38,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+
 import javax.swing.JTable;
 
 import controller.CadastroController;
@@ -191,6 +192,7 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		lblAdmin.setVisible(isAdmin);
 		painelNav.add(lblAdmin);
 
+
 		JButton btnDashboard = criarBotaoMenu("Dashboard");
 		btnDashboard.setBounds(4, 467, 170, 32);
 		btnDashboard.addActionListener(e -> cardLayout.show(painelConteudo, "DASHBOARD"));
@@ -226,7 +228,13 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		btnEditarUsuario.setVisible(isAdmin);
 		painelNav.add(btnEditarUsuario);
 
-		painelNav.setPreferredSize(new Dimension(175, 626));
+		JButton btnPedidos = criarBotaoMenu("Pedidos de Reserva");
+		btnPedidos.setBounds(4, 619, 170, 32);
+		btnPedidos.addActionListener(e -> cardLayout.show(painelConteudo, "PEDIDOS"));
+		btnPedidos.setVisible(isAdmin);
+		painelNav.add(btnPedidos);
+
+		painelNav.setPreferredSize(new Dimension(175, 665));
 
 		JScrollPane scrollNav = new JScrollPane(painelNav,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -265,6 +273,7 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		painelConteudo.add(criarPainelDashboard(), "DASHBOARD");
 		painelInterditarAtual = criarPainelInterditar(laboratorios, hoje);
 		painelConteudo.add(painelInterditarAtual, "INTERDITAR");
+		painelConteudo.add(criarPainelEmDesenvolvimento("Pedidos de Reserva"), "PEDIDOS");
 
 		cardLayout.show(painelConteudo, "LABS");
 		carregarDisponibilidade(dataAtual);
@@ -1171,6 +1180,24 @@ private void abrirDialogoReativar(Laboratorio lab, Date hoje) {
 	    painelInterditarAtual = criarPainelInterditar(laboratorios, hoje);
 	    painelConteudo.add(painelInterditarAtual, "INTERDITAR");
 	    cardLayout.show(painelConteudo, "INTERDITAR");
+	}
+
+	private JPanel criarPainelEmDesenvolvimento(String titulo) {
+		JPanel painel = new JPanel(null);
+		painel.setBackground(Color.WHITE);
+
+		JLabel lblTitulo = new JLabel(titulo, SwingConstants.CENTER);
+		lblTitulo.setFont(new Font("Calibri", Font.PLAIN, 28));
+		lblTitulo.setBounds(0, 25, 1062, 42);
+		painel.add(lblTitulo);
+
+		JLabel lblMsg = new JLabel("Módulo em desenvolvimento", SwingConstants.CENTER);
+		lblMsg.setFont(new Font("Calibri", Font.ITALIC, 16));
+		lblMsg.setForeground(Color.GRAY);
+		lblMsg.setBounds(0, 260, 1062, 25);
+		painel.add(lblMsg);
+
+		return painel;
 	}
 
 	private JButton criarBotaoMenu(String texto) {

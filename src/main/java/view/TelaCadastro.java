@@ -146,7 +146,7 @@ public class TelaCadastro extends JFrame {
             if (perfilIndex > 0) {
                 Perfil perfilSelecionado = Perfil.values()[perfilIndex - 1];
                 if (perfilSelecionado == Perfil.ESTUDANTE_GUARDIAO) {
-                    JOptionPane.showMessageDialog(null, "A matrícula deve conter 5 números seguidos por 5 letras e 4 números. Ex: 20231adpls1234.");
+                    JOptionPane.showMessageDialog(null, "A matrícula deve conter 5 números seguidos por 5 letras e 4 números. Ex: 202XXADSPLXXXX.");
                 } else {
                     JOptionPane.showMessageDialog(null, "A matrícula deve conter 8 números. Ex: 11023456.");
                 }
@@ -433,7 +433,7 @@ public class TelaCadastro extends JFrame {
         } else if (perfilSelecionado == Perfil.ESTUDANTE_GUARDIAO) {
             if (!campoMatricula.getText().toUpperCase().matches("\\d{5}[A-Z]{5}\\d{4}")) {
                 destacarBorda(campoMatricula);
-                JOptionPane.showMessageDialog(null, "Matrícula inválida! Use o formato: 20251ADSPL0076", "Erro", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Matrícula inválida! Use o formato: 202XXADSPLXXXX", "Erro", JOptionPane.ERROR_MESSAGE);
                 return;
             } else { restaurarBorda(campoMatricula); }
         }
