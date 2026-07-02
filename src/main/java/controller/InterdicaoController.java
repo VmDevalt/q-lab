@@ -40,13 +40,13 @@ public class InterdicaoController {
         }
     }
 
-    public String removerInterdicao(int id) {
+    public String reativar(int laboratorioId, int idInterdicao) {
         try {
-            repository.remover(id);
+            repository.reativar(laboratorioId, idInterdicao);
             return null;
         } catch (SQLException e) {
             e.printStackTrace();
-            return "Erro ao remover interdição: " + e.getMessage();
+            return "Erro ao reativar laboratório: " + e.getMessage();
         }
     }
 }

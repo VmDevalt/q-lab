@@ -15,8 +15,12 @@ import util.ConnectionFactory;
 
 public class InterdicaoDao {
 
-    public int save(int laboratorioId, Date dataInicio, Date dataFim, String motivo) throws SQLException {
+    public int interditar(int laboratorioId, Date dataInicio, Date dataFim, String motivo) throws SQLException {
         String sql = "INSERT INTO interdicoes (laboratorio_id, data_inicio, data_fim, motivo, ativo) VALUES (?, ?, ?, ?, TRUE)";
+        String sqlLaboratorio = "UPDATE laboratorios SET ativo = FALSE WHERE id_laboratorio = ?";
+        int idGerado;
+
+
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, laboratorioId);
@@ -24,11 +28,21 @@ public class InterdicaoDao {
             ps.setDate(3, dataFim);
             ps.setString(4, motivo);
             ps.executeUpdate();
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) return rs.getInt(1);
-            }
-        }
-        throw new SQLException("Falha ao salvar interdição");
+	        try (ResultSet rs = ps.getGeneratedKeys()) {
+	            if (rs.next()) {
+	                idGerado = rs.getInt(1);
+	            } else {
+	                throw new SQLException("Falha ao salvar interdição");
+	            }
+	        }
+
+	        try (PreparedStatement psLab = conn.prepareStatement(sqlLaboratorio)) {
+	            psLab.setInt(1, laboratorioId);
+	            psLab.executeUpdate();
+	        }
+
+	        return idGerado;
+	    }
     }
 
     public boolean isInterditado(int laboratorioId, Date data) throws SQLException {
@@ -85,12 +99,21 @@ public class InterdicaoDao {
         return lista;
     }
 
-    public void remover(int id) throws SQLException {
-        String sql = "UPDATE interdicoes SET ativo = FALSE WHERE id_interdicao = ?";
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
+    public void reativar(int laboratorioId, int idInterdicao) throws SQLException {
+        String sqlInterdicao = "UPDATE interdicoes SET ativo = FALSE WHERE id_interdicao = ?";
+        String sqlLaboratorio = "UPDATE laboratorios SET ativo = TRUE WHERE id_laboratorio = ?";
+
+        try (Connection conn = ConnectionFactory.getConnection()) {
+
+            try (PreparedStatement psInterdicao = conn.prepareStatement(sqlInterdicao)) {
+                psInterdicao.setInt(1, idInterdicao);
+                psInterdicao.executeUpdate();
+            }
+
+            try (PreparedStatement psLab = conn.prepareStatement(sqlLaboratorio)) {
+                psLab.setInt(1, laboratorioId);
+                psLab.executeUpdate();
+            }
         }
     }
 }

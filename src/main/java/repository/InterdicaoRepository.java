@@ -12,7 +12,7 @@ public class InterdicaoRepository {
     private final InterdicaoDao dao = new InterdicaoDao();
 
     public int interditar(int laboratorioId, Date dataInicio, Date dataFim, String motivo) throws SQLException {
-        return dao.save(laboratorioId, dataInicio, dataFim, motivo);
+        return dao.interditar(laboratorioId, dataInicio, dataFim, motivo);
     }
 
     public boolean isInterditado(int laboratorioId, Date data) throws SQLException {
@@ -23,7 +23,7 @@ public class InterdicaoRepository {
         return dao.findAtivasByLaboratorio(laboratorioId);
     }
 
-    public void remover(int id) throws SQLException {
-        dao.remover(id);
+    public void reativar(int laboratorioId, int idInterdicao) throws SQLException {
+        dao.reativar(laboratorioId, idInterdicao);
     }
 }
