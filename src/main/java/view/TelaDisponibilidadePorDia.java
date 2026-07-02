@@ -40,11 +40,13 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JTable;
 
+import controller.CadastroController;
 import controller.InterdicaoController;
 import controller.LaboratorioController;
 import controller.ReservaController;
 import model.HorariosEnum;
 import model.Laboratorio;
+import model.Perfil;
 import model.Reserva;
 import model.StatusLab;
 import model.Usuario;
@@ -72,6 +74,8 @@ public class TelaDisponibilidadePorDia extends JFrame {
 	private final LaboratorioController labCtrl = new LaboratorioController();
 	private final ReservaController reservaCtrl = new ReservaController();
 	private final InterdicaoController interdicaoCtrl = new InterdicaoController();
+	private final CadastroController cadastroCtrl = new CadastroController();
+	private final Map<String, Usuario> usuarioCache = new HashMap<>();
 
 	private boolean modoSelecao = false;
 	private String tipoSelecao = null;
@@ -361,7 +365,7 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		}
 
 		tabelaLaboratorios = new JTable(tabelaHorarios);
-		tabelaLaboratorios.setRowHeight(30);
+		tabelaLaboratorios.setRowHeight(52);
 		tabelaLaboratorios.setFont(new Font("Calibri", Font.PLAIN, 14));
 		tabelaLaboratorios.getTableHeader().setFont(new Font("Calibri", Font.BOLD, 14));
 		tabelaLaboratorios.getTableHeader().setReorderingAllowed(false);
@@ -599,34 +603,53 @@ public class TelaDisponibilidadePorDia extends JFrame {
 			Laboratorio lab = laboratorios.get(labIdx);
 			boolean interditado = interdicaoCtrl.isInterditado(lab.getId(), data);
 
-			Set<HorariosEnum> ocupados = new HashSet<>();
+			Map<HorariosEnum, Reserva> mapaReservas = new HashMap<>();
 			if (!interditado) {
 				List<Reserva> reservas = reservaCtrl.reservasPorLabEData(lab.getId(), data);
-				for (Reserva r : reservas) {
-					ocupados.add(r.getHorario().getHorario());
-				}
+				for (Reserva r : reservas) mapaReservas.put(r.getHorario().getHorario(), r);
 			}
 
 			for (int slotIdx = 0; slotIdx < slots.length; slotIdx++) {
+				String val;
 				if (interditado) {
 					disponibilidade[slotIdx][labIdx] = StatusLab.INTERDITADO;
-				} else if (ocupados.contains(slots[slotIdx])) {
+					val = "<html><center><b>Interditado</b></center></html>";
+				} else if (mapaReservas.containsKey(slots[slotIdx])) {
 					disponibilidade[slotIdx][labIdx] = StatusLab.OCUPADO;
+					Reserva r = mapaReservas.get(slots[slotIdx]);
+					Usuario u = buscarUsuario(r.getMatricula());
+					String nome = u != null ? primeiroNome(u.getNome()) : r.getMatricula();
+					val = "<html><center><b>OCUPADO</b><br>" + nome + "</center></html>";
 				} else {
 					disponibilidade[slotIdx][labIdx] = StatusLab.LIVRE;
+					val = "";
 				}
-
-				String val = switch (disponibilidade[slotIdx][labIdx]) {
-					case OCUPADO -> "OCUPADO";
-					case INTERDITADO -> "INTERDITADO";
-					default -> "";
-				};
 				tabelaHorarios.setValueAt(val, slotIdx, labIdx + 1);
 			}
 		}
 
 		textFieldDia.setText(formatarData(data));
 		if (tabelaLaboratorios != null) tabelaLaboratorios.repaint();
+	}
+
+	private Usuario buscarUsuario(String matricula) {
+		return usuarioCache.computeIfAbsent(matricula, m -> cadastroCtrl.buscarUsuario(m));
+	}
+
+	private String primeiroNome(String nome) {
+		if (nome == null || nome.isBlank()) return "";
+		String[] partes = nome.trim().split("\\s+");
+		return partes[0];
+	}
+
+	private String labelPerfil(Usuario u) {
+		if (u.isAdministrador()) return "Admin";
+		if (u.getPerfil() == null) return "";
+		return switch (u.getPerfil()) {
+			case PROFESSOR -> "Professor";
+			case TECNICO -> "Técnico";
+			case ESTUDANTE_GUARDIAO -> "Est. Guardião";
+		};
 	}
 
 	private void navegarDia(int delta) {
@@ -814,11 +837,10 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		Laboratorio lab = laboratorios.get(labIdx);
 
 		if (tipoSelecao.equals("RESERVAR")) {
-			String disciplina = JOptionPane.showInputDialog(this,
-					"Reservar " + selecionados.size() + " horário(s) em " + lab.getNome()
-					+ "\n\nInforme a disciplina:",
-					"Confirmar Reserva", JOptionPane.PLAIN_MESSAGE);
-			if (disciplina == null || disciplina.trim().isEmpty()) return;
+			List<HorariosEnum> horariosSelec = new ArrayList<>();
+			for (int[] sel : selecionados) horariosSelec.add(HorariosEnum.values()[sel[0]]);
+			String disciplina = abrirDialogReserva(lab, horariosSelec);
+			if (disciplina == null) return;
 
 			List<String> erros = new ArrayList<>();
 			for (int[] sel : selecionados) {
@@ -875,8 +897,110 @@ public class TelaDisponibilidadePorDia extends JFrame {
 	    painelConteudo.repaint();
 	}	
 	
+	private String abrirDialogReserva(Laboratorio lab, List<HorariosEnum> horarios) {
+		final int W = 560;
+		JDialog dialog = new JDialog(this, "Confirmar Reserva", true);
+		dialog.setLayout(null);
+		dialog.setResizable(false);
+
+		JPanel faixa = new JPanel();
+		faixa.setBounds(0, 0, W, 8);
+		faixa.setBackground(new Color(27, 94, 32));
+		dialog.add(faixa);
+
+		JLabel lblTitulo = new JLabel("Confirmar Reserva");
+		lblTitulo.setFont(new Font("Calibri", Font.BOLD, 22));
+		lblTitulo.setForeground(new Color(27, 94, 32));
+		lblTitulo.setBounds(30, 20, 480, 34);
+		dialog.add(lblTitulo);
+
+		int y = 68;
+
+		JLabel lblLabTitulo = new JLabel("Laboratório:");
+		lblLabTitulo.setFont(new Font("Calibri", Font.BOLD, 15));
+		lblLabTitulo.setBounds(30, y, 130, 24);
+		dialog.add(lblLabTitulo);
+		JLabel lblLabVal = new JLabel(lab.getNome() + " – " + lab.getDescricao());
+		lblLabVal.setFont(new Font("Calibri", Font.PLAIN, 15));
+		lblLabVal.setBounds(165, y, 370, 24);
+		dialog.add(lblLabVal);
+		y += 32;
+
+		JLabel lblDataTitulo = new JLabel("Data:");
+		lblDataTitulo.setFont(new Font("Calibri", Font.BOLD, 15));
+		lblDataTitulo.setBounds(30, y, 130, 24);
+		dialog.add(lblDataTitulo);
+		JLabel lblDataVal = new JLabel(formatarData(dataAtual));
+		lblDataVal.setFont(new Font("Calibri", Font.PLAIN, 15));
+		lblDataVal.setBounds(165, y, 370, 24);
+		dialog.add(lblDataVal);
+		y += 32;
+
+		JLabel lblHorTitulo = new JLabel("Horário(s):");
+		lblHorTitulo.setFont(new Font("Calibri", Font.BOLD, 15));
+		lblHorTitulo.setBounds(30, y, 130, 24);
+		dialog.add(lblHorTitulo);
+		for (HorariosEnum slot : horarios) {
+			JLabel lblSlot = new JLabel(slot.name() + "   " + slot.getHi() + " – " + slot.getHf());
+			lblSlot.setFont(new Font("Calibri", Font.PLAIN, 15));
+			lblSlot.setBounds(165, y, 360, 24);
+			dialog.add(lblSlot);
+			y += 26;
+		}
+		y += 14;
+
+		JSeparator sep = new JSeparator();
+		sep.setBounds(30, y, W - 60, 2);
+		dialog.add(sep);
+		y += 16;
+
+		JLabel lblDiscTitulo = new JLabel("Disciplina: *");
+		lblDiscTitulo.setFont(new Font("Calibri", Font.BOLD, 15));
+		lblDiscTitulo.setBounds(30, y, 130, 32);
+		dialog.add(lblDiscTitulo);
+
+		JTextField txtDisciplina = new JTextField();
+		txtDisciplina.setFont(new Font("Calibri", Font.PLAIN, 15));
+		txtDisciplina.setBounds(165, y, 360, 32);
+		dialog.add(txtDisciplina);
+		y += 54;
+
+		String[] result = {null};
+
+		JButton btnCancelar = new JButton("Cancelar");
+		btnCancelar.setFont(new Font("Calibri", Font.PLAIN, 14));
+		btnCancelar.setFocusable(false);
+		btnCancelar.setBounds(W - 280, y, 110, 36);
+		btnCancelar.addActionListener(e -> dialog.dispose());
+		dialog.add(btnCancelar);
+
+		JButton btnOk = new JButton("Confirmar");
+		btnOk.setFont(new Font("Calibri", Font.BOLD, 14));
+		btnOk.setBackground(new Color(27, 94, 32));
+		btnOk.setForeground(Color.WHITE);
+		btnOk.setFocusable(false);
+		btnOk.setBounds(W - 160, y, 125, 36);
+		btnOk.addActionListener(e -> {
+			String disc = txtDisciplina.getText().trim();
+			if (disc.isEmpty()) {
+				txtDisciplina.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+				return;
+			}
+			result[0] = disc;
+			dialog.dispose();
+		});
+		dialog.add(btnOk);
+		dialog.getRootPane().setDefaultButton(btnOk);
+
+		y += 70;
+		dialog.setSize(W, y);
+		dialog.setLocationRelativeTo(this);
+		dialog.setVisible(true);
+		return result[0];
+	}
+
 	private String formatarData(Date data) {
-		SimpleDateFormat sdf = new SimpleDateFormat("EEEE – dd/MM/yyyy", new Locale("pt", "BR"));
+		SimpleDateFormat sdf = new SimpleDateFormat("EEEE – dd/MM/yyyy", Locale.forLanguageTag("pt-BR"));
 		String s = sdf.format(data);
 		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
@@ -1330,10 +1454,10 @@ private void abrirDialogoReativar(Laboratorio lab, Date hoje) {
 			HorariosEnum[] slots = HorariosEnum.values();
 
 			if (tipoSel[0].equals("RESERVAR")) {
-				String disciplina = JOptionPane.showInputDialog(painel,
-						"Reservar " + sorted.size() + " horário(s) em " + lab.getNome()
-						+ "\n\nInforme a disciplina:", "Confirmar Reserva", JOptionPane.PLAIN_MESSAGE);
-				if (disciplina == null || disciplina.trim().isEmpty()) return;
+				List<HorariosEnum> horariosSelec = new ArrayList<>();
+				for (int idx : sorted) horariosSelec.add(slots[idx]);
+				String disciplina = abrirDialogReserva(lab, horariosSelec);
+				if (disciplina == null) return;
 				List<String> erros = new ArrayList<>();
 				for (int idx : sorted) {
 					String erro = reservaCtrl.realizarReserva(dataAtual, slots[idx], lab.getId(),
@@ -1417,10 +1541,9 @@ private void abrirDialogoReativar(Laboratorio lab, Date hoje) {
 			} else if (mapa.containsKey(slots[i])) {
 				Reserva r = mapa.get(slots[i]);
 				model.setValueAt("OCUPADO", i, 1);
-				String detalhe = isAdmin
-						? r.getMatricula() + " – " + r.getDisciplina()
-						: r.getDisciplina();
-				model.setValueAt(detalhe, i, 2);
+				Usuario u = buscarUsuario(r.getMatricula());
+				String nomeCompleto = u != null ? u.getNome() : r.getMatricula();
+				model.setValueAt(nomeCompleto + " – " + r.getDisciplina(), i, 2);
 			} else {
 				model.setValueAt("LIVRE", i, 1);
 				model.setValueAt("—", i, 2);
@@ -1456,14 +1579,19 @@ private void abrirDialogoReativar(Laboratorio lab, Date hoje) {
 				}
 			}
 
-			String v = valor == null ? "" : valor.toString();
-			if (v.equals("OCUPADO")) {
+			StatusLab status = (disponibilidade != null
+					&& linha < disponibilidade.length
+					&& labIdx < disponibilidade[linha].length)
+					? disponibilidade[linha][labIdx] : StatusLab.LIVRE;
+			if (status == StatusLab.OCUPADO) {
 				setBackground(new Color(255, 82, 82));
 				setForeground(Color.WHITE);
-			} else if (v.equals("INTERDITADO")) {
+			} else if (status == StatusLab.INTERDITADO) {
 				setBackground(new Color(180, 180, 180));
+				setForeground(Color.DARK_GRAY);
 			} else {
 				setBackground(new Color(126, 217, 87));
+				setForeground(Color.DARK_GRAY);
 			}
 
 			return this;
