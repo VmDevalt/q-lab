@@ -13,7 +13,7 @@ import util.ConnectionFactory;
 public class LaboratorioDao {
 
     public List<Laboratorio> findAll() throws SQLException {
-        String sql = "SELECT * FROM laboratorios WHERE ativo = TRUE ORDER BY nome";
+        String sql = "SELECT * FROM laboratorios  ORDER BY nome";
         List<Laboratorio> labs = new ArrayList<>();
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);

@@ -396,7 +396,7 @@ public class TelaCadastro extends JFrame {
 
     private void realizarCadastro() {
         String nome = campoNome.getText().trim();
-        String matricula = campoMatricula.getText().trim();
+        String matricula = campoMatricula.getText().trim().toUpperCase();
         String email = campoEmail.getText().trim();
         String cpf = campoCpf.getText();
         String telefone = campoTelefone.getText();

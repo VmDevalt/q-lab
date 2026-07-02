@@ -60,6 +60,9 @@ public class TelaDisponibilidadePorDia extends JFrame {
 	private CardLayout cardLayout;
 	private JTable tabelaLaboratorios;
 	private JTextField textFieldDia;
+	private JPanel painelInterditarAtual;
+	private JPanel painelGridLabsAtual;
+
 
 	private Usuario usuarioLogado;
 	private boolean isAdmin;
@@ -247,10 +250,12 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		painelConteudo.setBounds(193, 5, 1062, 672);
 		painelConteudo.setBackground(Color.WHITE);
 		contentPane.add(painelConteudo);
+		Date hoje = new Date(System.currentTimeMillis());
 
 		String[] cardKeys = {"LAB01", "LAB02", "LAB03", "LAB05", "LAB06", "LAB07"};
 
-		painelConteudo.add(criarPainelGridLabs(laboratorios, cardKeys), "LABS");
+		painelGridLabsAtual = criarPainelGridLabs(laboratorios, cardKeys);
+		painelConteudo.add(painelGridLabsAtual, "LABS");
 		painelConteudo.add(criarPainelTabela(), "TABELA");
 
 		for (int i = 0; i < laboratorios.size() && i < cardKeys.length; i++) {
@@ -258,7 +263,8 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		}
 
 		painelConteudo.add(criarPainelDashboard(), "DASHBOARD");
-		painelConteudo.add(criarPainelInterdicao(), "INTERDITAR");
+		painelInterditarAtual = criarPainelInterditar(laboratorios, hoje);
+		painelConteudo.add(painelInterditarAtual, "INTERDITAR");
 
 		cardLayout.show(painelConteudo, "LABS");
 		carregarDisponibilidade(dataAtual);
@@ -284,21 +290,25 @@ public class TelaDisponibilidadePorDia extends JFrame {
 
 			boolean interditado = interdicaoCtrl.isInterditado(lab.getId(), dataAtual);
 			String statusTxt = interditado ? "Interditado" : "Disponível";
-			Color statusCor = interditado ? new Color(180, 0, 0) : new Color(34, 139, 34);
-			Color bordaCor = interditado ? new Color(180, 0, 0) : new Color(34, 139, 34);
-
-			JPanel painelLab = new JPanel(null);
+			 
+			Color corTexto = interditado ? Color.GRAY : new Color(34, 139, 34);
+		    Color bordaCor = interditado ? Color.LIGHT_GRAY : new Color(34, 139, 34);
+		    Color fundoCor = interditado ? new Color(225, 225, 225) : Color.WHITE;
+		    Color fundoHover = interditado ? new Color(210, 210, 210) : new Color(240, 245, 240);
+			
+		        JPanel painelLab = new JPanel(null);
 			painelLab.setBounds(colX[col], rowY[row], 220, 170);
-			painelLab.setBackground(Color.WHITE);
+			painelLab.setBackground(fundoCor);
 			painelLab.setBorder(BorderFactory.createLineBorder(bordaCor, 2));
 			painelLab.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			painelLab.addMouseListener(new java.awt.event.MouseAdapter() {
+				
 				@Override public void mouseEntered(java.awt.event.MouseEvent e) {
-					painelLab.setBackground(new Color(240, 245, 240));
+					painelLab.setBackground(fundoHover);
 					painelLab.setBorder(BorderFactory.createLineBorder(bordaCor, 3));
 				}
 				@Override public void mouseExited(java.awt.event.MouseEvent e) {
-					painelLab.setBackground(Color.WHITE);
+					painelLab.setBackground(fundoCor);
 					painelLab.setBorder(BorderFactory.createLineBorder(bordaCor, 2));
 				}
 				@Override public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -308,7 +318,7 @@ public class TelaDisponibilidadePorDia extends JFrame {
 
 			JLabel lblNome = new JLabel(lab.getNome(), SwingConstants.CENTER);
 			lblNome.setFont(new Font("Calibri", Font.BOLD, 18));
-			lblNome.setForeground(statusCor);
+			lblNome.setForeground(corTexto);
 			lblNome.setBounds(5, 15, 210, 25);
 			painelLab.add(lblNome);
 
@@ -877,6 +887,16 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		carregarDisponibilidade(dataAtual);
 	}
 
+	private void atualizarPainelGridLabs() {
+	    String[] cardKeys = {"LAB01", "LAB02", "LAB03", "LAB05", "LAB06", "LAB07"};
+	    painelConteudo.remove(painelGridLabsAtual);
+	    List<Laboratorio> labsAtualizados = labCtrl.listarLaboratorios();
+	    painelGridLabsAtual = criarPainelGridLabs(labsAtualizados, cardKeys);
+	    painelConteudo.add(painelGridLabsAtual, "LABS");
+	    painelConteudo.revalidate();
+	    painelConteudo.repaint();
+	}	
+	
 	private String abrirDialogReserva(Laboratorio lab, List<HorariosEnum> horarios) {
 		final int W = 560;
 		JDialog dialog = new JDialog(this, "Confirmar Reserva", true);
@@ -985,22 +1005,172 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
 
-	private JPanel criarPainelInterdicao() {
-		JPanel painel = new JPanel(null);
-		painel.setBackground(Color.WHITE);
+private JPanel criarPainelInterditar(List<Laboratorio> labs, Date hoje) {
+		
+		
+		
+	    JPanel painel = new JPanel();
+	    painel.setBackground(Color.WHITE);
+	    painel.setLayout(null);
 
-		JLabel titulo = new JLabel("Interditar Laboratório", SwingConstants.CENTER);
-		titulo.setFont(new Font("Calibri", Font.PLAIN, 28));
-		titulo.setBounds(0, 25, 1062, 42);
-		painel.add(titulo);
+	    JLabel titulo = new JLabel("Interditar Laboratório", SwingConstants.CENTER);
+	    titulo.setFont(new Font("Calibri", Font.PLAIN, 32));
+	    titulo.setBounds(0, 25, 1062, 42);
+	    painel.add(titulo);
 
-		JLabel msg = new JLabel("Módulo em desenvolvimento", SwingConstants.CENTER);
-		msg.setFont(new Font("Calibri", Font.ITALIC, 16));
-		msg.setForeground(Color.GRAY);
-		msg.setBounds(0, 260, 1062, 25);
-		painel.add(msg);
+	    int[] colX = {100, 420, 740};
+	    int[] rowY  = {150, 390};
 
-		return painel;
+	    for (int i = 0; i < labs.size(); i++) {
+	        Laboratorio lab = labs.get(i);
+	        int col = i % 3;
+	        int row = i / 3;
+
+	        boolean interditado = interdicaoCtrl.isInterditado(lab.getId(), hoje);
+	        String statusTxt = interditado ? "Interditado" : "Disponível";
+	        
+	        Color corTexto = interditado ? Color.GRAY : new Color(34, 139, 34);
+	        Color bordaCor = interditado ? Color.LIGHT_GRAY : new Color(34, 139, 34);
+	        Color fundoCor = interditado ? new Color(225, 225, 225) : Color.WHITE;
+	        Color fundoHover = interditado ? new Color(210, 210, 210) : new Color(240, 245, 240);
+
+	        JPanel painelLab = new JPanel();
+	        painelLab.setLayout(null);
+	        painelLab.setBounds(colX[col], rowY[row], 220, 170);
+	        painelLab.setBackground(fundoCor);
+	        painelLab.setBorder(BorderFactory.createLineBorder(bordaCor, 2));
+	        painelLab.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+	        painelLab.addMouseListener(new java.awt.event.MouseAdapter() {
+	            @Override public void mouseEntered(java.awt.event.MouseEvent e) {
+	                painelLab.setBackground(fundoHover);
+	                painelLab.setBorder(BorderFactory.createLineBorder(bordaCor, 3));
+	            }
+	            @Override public void mouseExited(java.awt.event.MouseEvent e) {
+	                painelLab.setBackground(fundoCor);
+	                painelLab.setBorder(BorderFactory.createLineBorder(bordaCor, 2));
+	            }
+	            @Override public void mouseClicked(java.awt.event.MouseEvent e) {
+	                if (interditado) {
+	                	abrirDialogoReativar(lab, hoje);
+	                }else {
+	                	abrirDialogoInterditar(lab, hoje);
+	                }
+	                }
+	        });
+	        
+
+	        JLabel lblNome = new JLabel(lab.getNome(), SwingConstants.CENTER);
+	        lblNome.setFont(new Font("Calibri", Font.BOLD, 18));
+	        lblNome.setForeground(corTexto);
+	        lblNome.setBounds(5, 15, 210, 25);
+	        painelLab.add(lblNome);
+
+	        JLabel lblDescricao = new JLabel(
+	            "<html><center>" + lab.getDescricao() + "<br>"
+	            + lab.getAndar() + "<br><br>"
+	            + "<b>Status:</b> " + statusTxt + "<br>"
+	            + "<b>Computadores:</b> " + lab.getCapacidade() + "</center></html>",
+	            SwingConstants.CENTER
+	        );
+	        lblDescricao.setFont(new Font("Calibri", Font.PLAIN, 12));
+	        lblDescricao.setForeground(Color.GRAY);
+	        lblDescricao.setBounds(5, 48, 210, 108);
+	        painelLab.add(lblDescricao);
+
+	        painel.add(painelLab);
+	    }
+
+	    return painel;
+	}
+private void abrirDialogoReativar(Laboratorio lab, Date hoje) {
+    int resp = JOptionPane.showConfirmDialog(this,
+            "O " + lab.getNome() + " está interditado.\nDeseja remover a interdição?",
+            "Reativar Laboratório", JOptionPane.YES_NO_OPTION);
+
+    if (resp != JOptionPane.YES_OPTION) return;
+
+    List<model.Interdicao> ativas = interdicaoCtrl.listarInterdicoesAtivas(lab.getId());
+
+    model.Interdicao vigente = ativas.stream()
+            .filter(i -> !hoje.before(i.getDataInicio()) && !hoje.after(i.getDataFim()))
+            .findFirst()
+            .orElse(null);
+
+    if (vigente == null) {
+        JOptionPane.showMessageDialog(this, "Nenhuma interdição ativa encontrada para hoje.",
+                "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    String erro = interdicaoCtrl.reativar(lab.getId(), vigente.getId());
+    if (erro != null) {
+        JOptionPane.showMessageDialog(this, erro, "Erro", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    JOptionPane.showMessageDialog(this, "Interdição removida com sucesso.");
+    atualizarPainelInterditar();
+    atualizarPainelGridLabs();
+}
+	private void abrirDialogoInterditar(Laboratorio lab, Date hoje) {
+	    boolean interditado = interdicaoCtrl.isInterditado(lab.getId(), hoje);
+
+	    if (interditado) {
+	        JOptionPane.showMessageDialog(this,
+	                "O " + lab.getNome() + " já está interditado.",
+	                "Aviso", JOptionPane.INFORMATION_MESSAGE);
+	        return;
+	    }
+
+	    String motivo = JOptionPane.showInputDialog(this,
+	            "Motivo da interdição de " + lab.getNome() + ":",
+	            "Interditar Laboratório", JOptionPane.PLAIN_MESSAGE);
+
+	    if (motivo == null || motivo.trim().isEmpty()) return;
+
+	    String dataFimStr = JOptionPane.showInputDialog(this,
+	            "Data final da interdição (dd-MM-yyyy):",
+	            "Interditar Laboratório", JOptionPane.PLAIN_MESSAGE);
+
+	    if (dataFimStr == null || dataFimStr.trim().isEmpty()) return;
+
+	    Date dataFim;
+	    
+	    
+	    
+	    try {
+	        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy");
+	        java.util.Date parsed = sdf.parse(dataFimStr.trim());
+	        dataFim = new Date(parsed.getTime());
+	    } catch (java.text.ParseException ex) {
+	        JOptionPane.showMessageDialog(this, "Data inválida. Use o formato dd-MM-yyyy.",
+	                "Erro", JOptionPane.ERROR_MESSAGE);
+	        return;
+	    }
+	    if (dataFim.before(hoje)) {
+	    	 JOptionPane.showMessageDialog(this, "Data inválida. Data fim não pode ser no passado",
+		                "Erro", JOptionPane.ERROR_MESSAGE);
+	    	 return;
+	    }
+
+	    String erro = interdicaoCtrl.interditar(lab.getId(), hoje, dataFim, motivo.trim());
+	    if (erro != null) {
+	        JOptionPane.showMessageDialog(this, erro, "Erro", JOptionPane.ERROR_MESSAGE);
+	        return;
+	    }
+
+	    JOptionPane.showMessageDialog(this, "Laboratório interditado com sucesso.");
+	    atualizarPainelInterditar();
+	    atualizarPainelGridLabs();
+	}
+	private void atualizarPainelInterditar() {
+	    painelConteudo.remove(painelInterditarAtual);
+	    List<Laboratorio> laboratorios = labCtrl.listarLaboratorios();
+	    Date hoje = new Date(System.currentTimeMillis());
+	    painelInterditarAtual = criarPainelInterditar(laboratorios, hoje);
+	    painelConteudo.add(painelInterditarAtual, "INTERDITAR");
+	    cardLayout.show(painelConteudo, "INTERDITAR");
 	}
 
 	private JButton criarBotaoMenu(String texto) {
