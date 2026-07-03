@@ -32,6 +32,22 @@ public class ReservaDao {
         }
         throw new SQLException("Falha ao salvar reserva");
     }
+    
+    public int saveSolicitacao(int horarioId, String matricula, String disciplina, String responsavelMatricula) throws SQLException {
+        String sql = "INSERT INTO reservas (horario_id, matricula, disciplina, status, responsavel_matricula) VALUES (?, ?, ?, 'SOLICITADA', ?)";
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, horarioId);
+            ps.setString(2, matricula);
+            ps.setString(3, disciplina);
+            ps.setString(4, responsavelMatricula);
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        }
+        throw new SQLException("Falha ao salvar reserva");
+    }
 
     public Reserva findAgendadaByHorario(int horarioId) throws SQLException {
         String sql = buildJoinQuery("r.horario_id = ? AND r.status = 'AGENDADA'");
@@ -43,6 +59,19 @@ public class ReservaDao {
             }
         }
         return null;
+    }
+    
+    public List<Reserva> findSolicitacoesByResponsavel(String responsavelMatricula) throws SQLException {
+        String sql = buildJoinQuery("r.responsavel_matricula = ? AND r.status = 'SOLICITADA'");
+        List<Reserva> listaSolicitacoes = new ArrayList<>();
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, responsavelMatricula);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) listaSolicitacoes.add(mapRow(rs));
+            }
+        }
+        return listaSolicitacoes;
     }
 
     public List<Reserva> findByMatricula(String matricula) throws SQLException {
@@ -94,9 +123,18 @@ public class ReservaDao {
         }
     }
 
+    public void aprovarReserva(int idReserva) throws SQLException {
+        String sql = "UPDATE reservas SET status = 'AGENDADA' WHERE id_reserva = ?";
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idReserva);
+            ps.executeUpdate();
+        }
+    }
+    
     private String buildJoinQuery(String whereClause) {
         return """
-            SELECT r.id_reserva, r.matricula, r.disciplina, r.status,
+            SELECT r.id_reserva, r.matricula, r.disciplina, r.status, r.responsavel_matricula,
                    h.id_horario, h.dia, h.horario,
                    l.id_laboratorio, l.nome, l.descricao, l.andar, l.capacidade, l.ativo
             FROM reservas r
@@ -125,7 +163,8 @@ public class ReservaDao {
             horario,
             rs.getString("matricula"),
             rs.getString("disciplina"),
-            StatusReserva.valueOf(rs.getString("status"))
+            StatusReserva.valueOf(rs.getString("status")),
+            rs.getString("responsavel_matricula")
         );
     }
 }

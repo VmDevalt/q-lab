@@ -49,9 +49,11 @@ CREATE TABLE IF NOT EXISTS reservas (
     horario_id INT         NOT NULL,
     matricula  VARCHAR(14) NOT NULL,
     disciplina VARCHAR(80),
-    status     ENUM('AGENDADA','CANCELADA') DEFAULT 'AGENDADA',
+    status     ENUM('AGENDADA','SOLICITADA','CANCELADA') DEFAULT 'AGENDADA',
+    responsavel_matricula VARCHAR(14),
+    FOREIGN KEY (matricula) REFERENCES usuarios(matricula),
     FOREIGN KEY (horario_id) REFERENCES horarios(id_horario),
-    FOREIGN KEY (matricula)  REFERENCES usuarios(matricula)
+    FOREIGN KEY (responsavel_matricula)  REFERENCES usuarios(matricula)
 );
 
 CREATE TABLE IF NOT EXISTS interdicoes (
