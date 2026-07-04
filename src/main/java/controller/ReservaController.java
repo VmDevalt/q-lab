@@ -35,6 +35,22 @@ public class ReservaController {
         }
     }
 
+    public String criarSolicitacao(Date dia, HorariosEnum slot, int laboratorioId,
+                                    String matricula, String disciplina, String responsavelMatricula) {
+        try {
+            if (interdicaoRepo.isInterditado(laboratorioId, dia))
+                return "O laboratório está interditado nesta data.";
+            int horarioId = horarioRepo.encontrarOuCriar(dia, slot, laboratorioId);
+            if (reservaRepo.buscarAgendadaPorHorario(horarioId) != null)
+                return "Este horário já está reservado.";
+            reservaRepo.criarSolicitacao(horarioId, matricula, disciplina, responsavelMatricula);
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "Erro ao criar solicitação: " + e.getMessage();
+        }
+    }
+
     public String cancelarReserva(int idReserva) {
         try {
             reservaRepo.cancelar(idReserva);
@@ -76,6 +92,34 @@ public class ReservaController {
     public List<Reserva> reservasPorLabEData(int laboratorioId, Date data) {
         try {
             return reservaRepo.buscarPorLaboratorioEData(laboratorioId, data);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+    public String aprovarReserva(int idReserva) {
+        try {
+            reservaRepo.aprovarReserva(idReserva);
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "Erro ao aprovar reserva: " + e.getMessage();
+        }
+    }
+
+    public List<Reserva> listarSolicitacoesPorResponsavel(String responsavelMatricula) {
+        try {
+            return reservaRepo.findSolicitacoesByResponsavel(responsavelMatricula);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+    public List<Reserva> listarTodasSolicitacoes() {
+        try {
+            return reservaRepo.listarTodasSolicitacoes();
         } catch (SQLException e) {
             e.printStackTrace();
             return Collections.emptyList();

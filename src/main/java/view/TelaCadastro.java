@@ -95,12 +95,12 @@ public class TelaCadastro extends JFrame {
 
         comboBox = new JComboBox<>();
         comboBox.setFont(new Font("Calibri", Font.BOLD, 13));
-        comboBox.setModel(new DefaultComboBoxModel<>(new String[]{"    Selecione...", "Professor", "Técnico", "Estudante_GUARDIAO"}));
+        comboBox.setModel(new DefaultComboBoxModel<>(new String[]{"    Selecione...", "Professor", "Técnico", "Estudante Guardião"}));
         comboBox.setBounds(410, 114, 167, 28);
         comboBox.addItemListener(evt -> campoMatricula.setText(campoMatricula.getText()));
         comboBox.addActionListener(e -> {
             String selecionado = (String) comboBox.getSelectedItem();
-            if (selecionado.contains("Estudante_GUARDIAO")) {
+            if (selecionado.contains("Guardião")) {
                 checkBoxAdministrador.setSelected(false);
                 checkBoxAdministrador.setEnabled(false);
             } else {

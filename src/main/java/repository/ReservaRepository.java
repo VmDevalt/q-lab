@@ -35,11 +35,23 @@ public class ReservaRepository {
         return dao.findHistoricoByMatricula(matricula);
     }
 
+    public void atualizar(int idReserva, String novaDisciplina) throws SQLException {
+        dao.atualizar(idReserva, novaDisciplina);
+    }
+
     public void cancelar(int idReserva) throws SQLException {
         dao.cancelar(idReserva);
     }
-    
+
+    public int criarSolicitacao(int horarioId, String matricula, String disciplina, String responsavelMatricula) throws SQLException {
+        return dao.saveSolicitacao(horarioId, matricula, disciplina, responsavelMatricula);
+    }
+
     public void aprovarReserva(int idReserva) throws SQLException {
-    	dao.aprovarReserva(idReserva);
+        dao.aprovarReserva(idReserva);
+    }
+
+    public List<Reserva> listarTodasSolicitacoes() throws SQLException {
+        return dao.findAllSolicitacoes();
     }
 }

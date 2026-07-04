@@ -114,6 +114,16 @@ public class ReservaDao {
         return lista;
     }
 
+    public void atualizar(int idReserva, String novaDisciplina) throws SQLException {
+        String sql = "UPDATE reservas SET disciplina = ? WHERE id_reserva = ?";
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, novaDisciplina);
+            ps.setInt(2, idReserva);
+            ps.executeUpdate();
+        }
+    }
+
     public void cancelar(int idReserva) throws SQLException {
         String sql = "UPDATE reservas SET status = 'CANCELADA' WHERE id_reserva = ?";
         try (Connection conn = ConnectionFactory.getConnection();
@@ -132,6 +142,17 @@ public class ReservaDao {
         }
     }
     
+    public List<Reserva> findAllSolicitacoes() throws SQLException {
+        String sql = buildJoinQuery("r.status = 'SOLICITADA'");
+        List<Reserva> lista = new ArrayList<>();
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) lista.add(mapRow(rs));
+        }
+        return lista;
+    }
+
     private String buildJoinQuery(String whereClause) {
         return """
             SELECT r.id_reserva, r.matricula, r.disciplina, r.status, r.responsavel_matricula,

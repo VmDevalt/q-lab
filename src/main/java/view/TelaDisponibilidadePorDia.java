@@ -234,7 +234,8 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		JButton btnPedidos = criarBotaoMenu("Pedidos de Reserva");
 		btnPedidos.setBounds(4, 615, 170, 32);
 		btnPedidos.addActionListener(e -> cardLayout.show(painelConteudo, "PEDIDOS"));
-		btnPedidos.setVisible(isAdmin);
+		boolean podePedidos = isAdmin || (usuarioLogado != null && usuarioLogado.getPerfil() == Perfil.PROFESSOR);
+		btnPedidos.setVisible(podePedidos);
 		painelNav.add(btnPedidos);
 
 		painelNav.setPreferredSize(new Dimension(175, 665));
@@ -287,46 +288,150 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		JPanel painel = new JPanel(null);
 		painel.setBackground(Color.WHITE);
 
-		JLabel titulo = new JLabel("Pedidos de reserva", SwingConstants.CENTER);
+		JLabel titulo = new JLabel("Pedidos de Reserva", SwingConstants.CENTER);
 		titulo.setFont(new Font("Calibri", Font.PLAIN, 30));
 		titulo.setBounds(0, 18, 1062, 40);
 		painel.add(titulo);
-		
+
 		JLabel lblTabTitulo = new JLabel("Reservas aguardando aprovação", SwingConstants.LEFT);
 		lblTabTitulo.setFont(new Font("Calibri", Font.BOLD, 16));
 		lblTabTitulo.setForeground(new Color(27, 94, 32));
-		lblTabTitulo.setBounds(28, 100, 300, 25);
+		lblTabTitulo.setBounds(28, 75, 400, 25);
 		painel.add(lblTabTitulo);
 
 		DefaultTableModel reservaModel = new DefaultTableModel(
-				new String[]{"Lab", "Horário", "Período", "Guardião", "Motivo", "Aceitar", "Recusar"}, 0) {
+				new String[]{"Lab", "Horário", "Período", "Guardião", "Disciplina", "Aceitar", "Recusar"}, 0) {
 			private static final long serialVersionUID = 1L;
 			@Override public boolean isCellEditable(int r, int c) { return false; }
 		};
 
+		List<List<Reserva>> grupos = new ArrayList<>();
+
 		JTable reservaTable = new JTable(reservaModel);
-		reservaTable.setRowHeight(26);
+		reservaTable.setRowHeight(30);
 		reservaTable.setFont(new Font("Calibri", Font.PLAIN, 13));
 		reservaTable.getTableHeader().setFont(new Font("Calibri", Font.BOLD, 13));
 		reservaTable.getTableHeader().setReorderingAllowed(false);
+		reservaTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		reservaTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 			private static final long serialVersionUID = 1L;
 			@Override public Component getTableCellRendererComponent(
-					JTable t, Object v, boolean sel, boolean foc, int r, int c) {
-				super.getTableCellRendererComponent(t, v, sel, foc, r, c);
-				setHorizontalAlignment(SwingConstants.CENTER);
-				setBackground(r % 2 == 0 ? Color.WHITE : new Color(245, 250, 245));
-				setForeground(Color.DARK_GRAY);
+					JTable t, Object v, boolean sel, boolean foc, int row, int col) {
+				super.getTableCellRendererComponent(t, v, sel, foc, row, col);
+				setHorizontalAlignment(col < 4 ? SwingConstants.LEFT : SwingConstants.CENTER);
+				if (col == 5) {
+					setBackground(new Color(232, 245, 233));
+					setForeground(new Color(27, 94, 32));
+					setFont(new Font("Calibri", Font.BOLD, 13));
+				} else if (col == 6) {
+					setBackground(new Color(255, 235, 238));
+					setForeground(new Color(183, 28, 28));
+					setFont(new Font("Calibri", Font.BOLD, 13));
+				} else {
+					setBackground(row % 2 == 0 ? Color.WHITE : new Color(245, 250, 245));
+					setForeground(Color.DARK_GRAY);
+					setFont(new Font("Calibri", Font.PLAIN, 13));
+				}
 				return this;
+			}
+		});
+		reservaTable.getColumnModel().getColumn(0).setPreferredWidth(80);
+		reservaTable.getColumnModel().getColumn(1).setPreferredWidth(260);
+		reservaTable.getColumnModel().getColumn(2).setPreferredWidth(65);
+		reservaTable.getColumnModel().getColumn(3).setPreferredWidth(190);
+		reservaTable.getColumnModel().getColumn(4).setPreferredWidth(220);
+		reservaTable.getColumnModel().getColumn(5).setPreferredWidth(90);
+		reservaTable.getColumnModel().getColumn(6).setPreferredWidth(90);
+
+		Runnable carregar = () -> {
+			reservaModel.setRowCount(0);
+			grupos.clear();
+			List<Reserva> lista = isAdmin
+					? reservaCtrl.listarTodasSolicitacoes()
+					: reservaCtrl.listarSolicitacoesPorResponsavel(
+							usuarioLogado != null ? usuarioLogado.getMatricula() : "");
+
+			Map<String, List<Reserva>> mapa = new java.util.LinkedHashMap<>();
+			for (Reserva r : lista) {
+				String chave = r.getMatricula() + "|" + r.getDisciplina() + "|" + r.getResponsavelMatricula();
+				mapa.computeIfAbsent(chave, k -> new ArrayList<>()).add(r);
+			}
+
+			for (List<Reserva> grupo : mapa.values()) {
+				grupo.sort(Comparator.comparingInt(r -> r.getHorario().getHorario().ordinal()));
+				grupos.add(grupo);
+
+				Reserva primeiro = grupo.get(0);
+				HorariosEnum primSlot = primeiro.getHorario().getHorario();
+
+				StringBuilder sbSlots = new StringBuilder();
+				for (int i = 0; i < grupo.size(); i++) {
+					HorariosEnum s = grupo.get(i).getHorario().getHorario();
+					if (i == 0) sbSlots.append(s.name()).append("  ").append(s.getHi()).append("–").append(s.getHf());
+					else sbSlots.append(", ").append(s.name());
+				}
+
+				String periodo = primSlot.name().startsWith("M") ? "Manha"
+						: primSlot.name().startsWith("T") ? "Tarde" : "Noite";
+				Usuario u = buscarUsuario(primeiro.getMatricula());
+				String guardiao = u != null ? u.getNome() : primeiro.getMatricula();
+
+				reservaModel.addRow(new Object[]{
+						primeiro.getHorario().getLaboratorio().getNome(),
+						sbSlots.toString(),
+						periodo,
+						guardiao,
+						primeiro.getDisciplina(),
+						"Aceitar",
+						"Recusar"
+				});
+			}
+		};
+
+		reservaTable.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override public void mouseClicked(java.awt.event.MouseEvent e) {
+				int row = reservaTable.rowAtPoint(e.getPoint());
+				int col = reservaTable.columnAtPoint(e.getPoint());
+				if (row < 0 || row >= grupos.size()) return;
+				List<Reserva> grupo = grupos.get(row);
+				String nomeGuardiao = (String) reservaModel.getValueAt(row, 3);
+				if (col == 5) {
+					for (Reserva r : grupo) {
+						String erro = reservaCtrl.aprovarReserva(r.getIdReserva());
+						if (erro != null) {
+							JOptionPane.showMessageDialog(painel, erro, "Erro", JOptionPane.ERROR_MESSAGE);
+							break;
+						}
+					}
+					carregar.run();
+				} else if (col == 6) {
+					int ok = JOptionPane.showConfirmDialog(painel,
+							"Recusar todos os " + grupo.size() + " horario(s) de " + nomeGuardiao + "?",
+							"Confirmar", JOptionPane.YES_NO_OPTION);
+					if (ok == JOptionPane.YES_OPTION) {
+						for (Reserva r : grupo) {
+							String erro = reservaCtrl.cancelarReserva(r.getIdReserva());
+							if (erro != null) {
+								JOptionPane.showMessageDialog(painel, erro, "Erro", JOptionPane.ERROR_MESSAGE);
+								break;
+							}
+						}
+						carregar.run();
+					}
+				}
 			}
 		});
 
 		JScrollPane scroll = new JScrollPane(reservaTable);
-		scroll.setBounds(28, 120, 1006, 420);
+		scroll.setBounds(28, 106, 1006, 430);
 		painel.add(scroll);
-		
+
+		painel.addComponentListener(new ComponentAdapter() {
+			@Override public void componentShown(ComponentEvent e) { carregar.run(); }
+		});
+
 		return painel;
-	};
+	}
 	
 
 	private JPanel criarPainelGridLabs(List<Laboratorio> labs, String[] cardKeys) {
@@ -1090,17 +1195,27 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		if (tipoSelecao.equals("RESERVAR")) {
 			List<HorariosEnum> horariosSelec = new ArrayList<>();
 			for (int[] sel : selecionados) horariosSelec.add(HorariosEnum.values()[sel[0]]);
-			String disciplina = abrirDialogReserva(lab, horariosSelec);
-			if (disciplina == null) return;
+			String[] resultado = abrirDialogReserva(lab, horariosSelec);
+			if (resultado == null) return;
+			String disciplina = resultado[0];
+			String responsavelMatricula = resultado[1];
+			boolean guardiao = usuarioLogado != null
+					&& usuarioLogado.getPerfil() == Perfil.ESTUDANTE_GUARDIAO;
 
 			List<String> erros = new ArrayList<>();
 			for (int[] sel : selecionados) {
-				String erro = reservaCtrl.realizarReserva(dataAtual, slots[sel[0]], lab.getId(),
-						usuarioLogado.getMatricula(), disciplina.trim());
+				String erro = guardiao
+						? reservaCtrl.criarSolicitacao(dataAtual, slots[sel[0]], lab.getId(),
+								usuarioLogado.getMatricula(), disciplina, responsavelMatricula)
+						: reservaCtrl.realizarReserva(dataAtual, slots[sel[0]], lab.getId(),
+								usuarioLogado.getMatricula(), disciplina);
 				if (erro != null) erros.add(slots[sel[0]].name() + ": " + erro);
 			}
 			if (erros.isEmpty()) {
-				JOptionPane.showMessageDialog(this, selecionados.size() + " horário(s) reservado(s) com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+				String msg = guardiao
+						? selecionados.size() + " solicitação(ões) enviada(s) para aprovação!"
+						: selecionados.size() + " horário(s) reservado(s) com sucesso!";
+				JOptionPane.showMessageDialog(this, msg, "Sucesso", JOptionPane.INFORMATION_MESSAGE);
 			} else {
 				JOptionPane.showMessageDialog(this, "Erros:\n" + String.join("\n", erros), "Aviso", JOptionPane.WARNING_MESSAGE);
 			}
@@ -1148,9 +1263,12 @@ public class TelaDisponibilidadePorDia extends JFrame {
 	    painelConteudo.repaint();
 	}	
 	
-	private String abrirDialogReserva(Laboratorio lab, List<HorariosEnum> horarios) {
+	private String[] abrirDialogReserva(Laboratorio lab, List<HorariosEnum> horarios) {
+		boolean isGuardiao = usuarioLogado != null
+				&& usuarioLogado.getPerfil() == Perfil.ESTUDANTE_GUARDIAO;
 		final int W = 560;
-		JDialog dialog = new JDialog(this, "Confirmar Reserva", true);
+		String tituloDialog = isGuardiao ? "Solicitar Reserva" : "Confirmar Reserva";
+		JDialog dialog = new JDialog(this, tituloDialog, true);
 		dialog.setLayout(null);
 		dialog.setResizable(false);
 
@@ -1159,7 +1277,7 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		faixa.setBackground(new Color(27, 94, 32));
 		dialog.add(faixa);
 
-		JLabel lblTitulo = new JLabel("Confirmar Reserva");
+		JLabel lblTitulo = new JLabel(tituloDialog);
 		lblTitulo.setFont(new Font("Calibri", Font.BOLD, 22));
 		lblTitulo.setForeground(new Color(27, 94, 32));
 		lblTitulo.setBounds(30, 20, 480, 34);
@@ -1214,9 +1332,26 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		txtDisciplina.setFont(new Font("Calibri", Font.PLAIN, 15));
 		txtDisciplina.setBounds(165, y, 360, 32);
 		dialog.add(txtDisciplina);
-		y += 54;
+		y += 44;
 
-		String[] result = {null};
+		JTextField txtResponsavel = null;
+		if (isGuardiao) {
+			JLabel lblRespTitulo = new JLabel("Matrícula do Responsável: *");
+			lblRespTitulo.setFont(new Font("Calibri", Font.BOLD, 15));
+			lblRespTitulo.setBounds(30, y, 220, 32);
+			dialog.add(lblRespTitulo);
+
+			txtResponsavel = new JTextField();
+			txtResponsavel.setFont(new Font("Calibri", Font.PLAIN, 15));
+			txtResponsavel.setBounds(255, y, 270, 32);
+			dialog.add(txtResponsavel);
+			y += 44;
+		}
+
+		final JTextField campoResp = txtResponsavel;
+		y += 10;
+
+		String[] result = {null, null};
 
 		JButton btnCancelar = new JButton("Cancelar");
 		btnCancelar.setFont(new Font("Calibri", Font.PLAIN, 14));
@@ -1225,7 +1360,7 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		btnCancelar.addActionListener(e -> dialog.dispose());
 		dialog.add(btnCancelar);
 
-		JButton btnOk = new JButton("Confirmar");
+		JButton btnOk = new JButton(isGuardiao ? "Solicitar" : "Confirmar");
 		btnOk.setFont(new Font("Calibri", Font.BOLD, 14));
 		btnOk.setBackground(new Color(27, 94, 32));
 		btnOk.setForeground(Color.WHITE);
@@ -1237,6 +1372,22 @@ public class TelaDisponibilidadePorDia extends JFrame {
 				txtDisciplina.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
 				return;
 			}
+			if (isGuardiao) {
+				String resp = campoResp.getText().trim();
+				if (resp.isEmpty()) {
+					campoResp.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+					return;
+				}
+				Usuario professor = cadastroCtrl.buscarUsuario(resp);
+				if (professor == null || professor.getPerfil() != Perfil.PROFESSOR) {
+					campoResp.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+					JOptionPane.showMessageDialog(dialog,
+							"Matrícula não encontrada ou não pertence a um professor.",
+							"Aviso", JOptionPane.WARNING_MESSAGE);
+					return;
+				}
+				result[1] = resp;
+			}
 			result[0] = disc;
 			dialog.dispose();
 		});
@@ -1247,7 +1398,7 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		dialog.setSize(W, y);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
-		return result[0];
+		return result[0] == null ? null : result;
 	}
 
 	private String formatarData(Date data) {
@@ -1725,16 +1876,27 @@ private void abrirDialogoReativar(Laboratorio lab, Date hoje) {
 			if (tipoSel[0].equals("RESERVAR")) {
 				List<HorariosEnum> horariosSelec = new ArrayList<>();
 				for (int idx : sorted) horariosSelec.add(slots[idx]);
-				String disciplina = abrirDialogReserva(lab, horariosSelec);
-				if (disciplina == null) return;
+				String[] resultado = abrirDialogReserva(lab, horariosSelec);
+				if (resultado == null) return;
+				String disciplina = resultado[0];
+				String responsavelMatricula = resultado[1];
+				boolean guardiao = usuarioLogado != null
+						&& usuarioLogado.getPerfil() == Perfil.ESTUDANTE_GUARDIAO;
+
 				List<String> erros = new ArrayList<>();
 				for (int idx : sorted) {
-					String erro = reservaCtrl.realizarReserva(dataAtual, slots[idx], lab.getId(),
-							usuarioLogado.getMatricula(), disciplina.trim());
+					String erro = guardiao
+							? reservaCtrl.criarSolicitacao(dataAtual, slots[idx], lab.getId(),
+									usuarioLogado.getMatricula(), disciplina, responsavelMatricula)
+							: reservaCtrl.realizarReserva(dataAtual, slots[idx], lab.getId(),
+									usuarioLogado.getMatricula(), disciplina);
 					if (erro != null) erros.add(slots[idx].name() + ": " + erro);
 				}
 				if (erros.isEmpty()) {
-					JOptionPane.showMessageDialog(painel, sorted.size() + " horário(s) reservado(s) com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+					String msg = guardiao
+							? sorted.size() + " solicitação(ões) enviada(s) para aprovação!"
+							: sorted.size() + " horário(s) reservado(s) com sucesso!";
+					JOptionPane.showMessageDialog(painel, msg, "Sucesso", JOptionPane.INFORMATION_MESSAGE);
 				} else {
 					JOptionPane.showMessageDialog(painel, "Erros:\n" + String.join("\n", erros), "Aviso", JOptionPane.WARNING_MESSAGE);
 				}
