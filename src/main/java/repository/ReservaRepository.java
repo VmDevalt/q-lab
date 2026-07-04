@@ -14,12 +14,17 @@ public class ReservaRepository {
     public int criar(int horarioId, String matricula, String disciplina) throws SQLException {
         return dao.save(horarioId, matricula, disciplina);
     }
+    
+    public int criarSolicitacao(int horarioId, String matricula, String disciplina, String responsavelMatricula) throws SQLException {
+        return dao.saveSolicitacao(horarioId, matricula, disciplina, responsavelMatricula);
+    }
+    
 
     public Reserva buscarAgendadaPorHorario(int horarioId) throws SQLException {
         return dao.findAgendadaByHorario(horarioId);
     }
     
-    public List<Reserva> findSolicitacoesByResponsavel(String responsavelMatricula) throws SQLException {
+    public List<Reserva> buscarSolicitacoesByResponsavel(String responsavelMatricula) throws SQLException {
     	return dao.findSolicitacoesByResponsavel(responsavelMatricula);
     }
 

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import model.HorariosEnum;
+import model.Perfil;
 import model.Reserva;
 import repository.HorarioRepository;
 import repository.InterdicaoRepository;
@@ -18,7 +19,7 @@ public class ReservaController {
     private final InterdicaoRepository interdicaoRepo = new InterdicaoRepository();
 
     public String realizarReserva(Date dia, HorariosEnum slot, int laboratorioId,
-                                   String matricula, String disciplina) {
+                                   String matricula, String disciplina, String responsavelMatricula, Perfil perfil) {
         try {
             if (interdicaoRepo.isInterditado(laboratorioId, dia)) {
                 return "O laboratório está interditado nesta data.";
@@ -27,7 +28,11 @@ public class ReservaController {
             if (reservaRepo.buscarAgendadaPorHorario(horarioId) != null) {
                 return "Este horário já está reservado.";
             }
-            reservaRepo.criar(horarioId, matricula, disciplina);
+            if (perfil == Perfil.ESTUDANTE_GUARDIAO) {
+            	reservaRepo.criarSolicitacao(horarioId, matricula, disciplina, responsavelMatricula);
+            } else {
+            	reservaRepo.criar(horarioId, matricula, disciplina);
+            }
             return null;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -44,6 +49,16 @@ public class ReservaController {
             return "Erro ao cancelar reserva: " + e.getMessage();
         }
     }
+    
+    public String aprovarReserva(int idReserva) {
+        try {
+            reservaRepo.aprovarReserva(idReserva);
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "Erro ao aprovar reserva: " + e.getMessage();
+        }
+    }
 
     public List<Reserva> listarReservasAtivas(String matricula) {
         try {
@@ -54,6 +69,15 @@ public class ReservaController {
         }
     }
 
+    public List<Reserva> buscarSolicitacoesByResponsavel(String responsavelMatricula) {
+        try {
+            return reservaRepo.buscarSolicitacoesByResponsavel(responsavelMatricula);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+    
     public List<Reserva> historico(String matricula) {
         try {
             return reservaRepo.historicoPorMatricula(matricula);

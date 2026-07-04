@@ -15,7 +15,7 @@ public class Reserva {
         this.matricula = matricula;
         this.disciplina = disciplina;
         this.status = status;
-        this.setResponsavelMatricula(responsavelMatricula);
+        this.responsavelMatricula= responsavelMatricula;
     }
 
     public int getIdReserva() { return idReserva; }
