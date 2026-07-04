@@ -65,6 +65,7 @@ public class TelaDisponibilidadePorDia extends JFrame {
 	private JTextField textFieldDia;
 	private JPanel painelInterditarAtual;
 	private JPanel painelGridLabsAtual;
+	private JPanel painelPedidosReserva;
 
 
 	private Usuario usuarioLogado;
@@ -275,11 +276,58 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		painelConteudo.add(criarPainelDashboard(), "DASHBOARD");
 		painelInterditarAtual = criarPainelInterditar(laboratorios, hoje);
 		painelConteudo.add(painelInterditarAtual, "INTERDITAR");
-		painelConteudo.add(criarPainelEmDesenvolvimento("Pedidos de Reserva"), "PEDIDOS");
+		painelPedidosReserva = criarPainelPedidosReserva();
+		painelConteudo.add(painelPedidosReserva, "PEDIDOS");
 
 		cardLayout.show(painelConteudo, "LABS");
 		carregarDisponibilidade(dataAtual);
 	}
+	
+	private JPanel criarPainelPedidosReserva() {
+		JPanel painel = new JPanel(null);
+		painel.setBackground(Color.WHITE);
+
+		JLabel titulo = new JLabel("Pedidos de reserva", SwingConstants.CENTER);
+		titulo.setFont(new Font("Calibri", Font.PLAIN, 30));
+		titulo.setBounds(0, 18, 1062, 40);
+		painel.add(titulo);
+		
+		JLabel lblTabTitulo = new JLabel("Reservas aguardando aprovação", SwingConstants.LEFT);
+		lblTabTitulo.setFont(new Font("Calibri", Font.BOLD, 16));
+		lblTabTitulo.setForeground(new Color(27, 94, 32));
+		lblTabTitulo.setBounds(28, 100, 300, 25);
+		painel.add(lblTabTitulo);
+
+		DefaultTableModel reservaModel = new DefaultTableModel(
+				new String[]{"Lab", "Horário", "Período", "Guardião", "Motivo", "Aceitar", "Recusar"}, 0) {
+			private static final long serialVersionUID = 1L;
+			@Override public boolean isCellEditable(int r, int c) { return false; }
+		};
+
+		JTable reservaTable = new JTable(reservaModel);
+		reservaTable.setRowHeight(26);
+		reservaTable.setFont(new Font("Calibri", Font.PLAIN, 13));
+		reservaTable.getTableHeader().setFont(new Font("Calibri", Font.BOLD, 13));
+		reservaTable.getTableHeader().setReorderingAllowed(false);
+		reservaTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+			private static final long serialVersionUID = 1L;
+			@Override public Component getTableCellRendererComponent(
+					JTable t, Object v, boolean sel, boolean foc, int r, int c) {
+				super.getTableCellRendererComponent(t, v, sel, foc, r, c);
+				setHorizontalAlignment(SwingConstants.CENTER);
+				setBackground(r % 2 == 0 ? Color.WHITE : new Color(245, 250, 245));
+				setForeground(Color.DARK_GRAY);
+				return this;
+			}
+		});
+
+		JScrollPane scroll = new JScrollPane(reservaTable);
+		scroll.setBounds(28, 120, 1006, 420);
+		painel.add(scroll);
+		
+		return painel;
+	};
+	
 
 	private JPanel criarPainelGridLabs(List<Laboratorio> labs, String[] cardKeys) {
 		JPanel painel = new JPanel(null);

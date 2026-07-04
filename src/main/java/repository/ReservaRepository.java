@@ -18,6 +18,10 @@ public class ReservaRepository {
     public Reserva buscarAgendadaPorHorario(int horarioId) throws SQLException {
         return dao.findAgendadaByHorario(horarioId);
     }
+    
+    public List<Reserva> findSolicitacoesByResponsavel(String responsavelMatricula) throws SQLException {
+    	return dao.findSolicitacoesByResponsavel(responsavelMatricula);
+    }
 
     public List<Reserva> buscarPorMatricula(String matricula) throws SQLException {
         return dao.findByMatricula(matricula);
@@ -34,8 +38,8 @@ public class ReservaRepository {
     public void cancelar(int idReserva) throws SQLException {
         dao.cancelar(idReserva);
     }
-
-    public void atualizar(int idReserva, String novaDisciplina) throws SQLException {
-        dao.atualizar(idReserva, novaDisciplina);
+    
+    public void aprovarReserva(int idReserva) throws SQLException {
+    	dao.aprovarReserva(idReserva);
     }
 }
