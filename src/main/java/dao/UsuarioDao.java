@@ -51,16 +51,18 @@ public class UsuarioDao {
         return true;
     }
 
-    public boolean update(Usuario usuario) throws SQLException {
-        String sql = "UPDATE usuarios SET nome=?, email=?, telefone=?, perfil=?, administrador=? WHERE matricula=?";
+    public boolean update(Usuario usuario, String matriculaOriginal) throws SQLException {
+        String sql = "UPDATE usuarios SET nome=?, email=?, matricula = ?, cpf = ?, telefone=?, perfil=?, administrador=? WHERE matricula=?";
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, usuario.getNome());
             ps.setString(2, usuario.getEmail());
-            ps.setString(3, usuario.getTelefone());
-            ps.setString(4, usuario.getPerfil().name());
-            ps.setBoolean(5, usuario.isAdministrador());
-            ps.setString(6, usuario.getMatricula());
+            ps.setString(3, usuario.getMatricula());           
+            ps.setString(4, usuario.getCpf());
+            ps.setString(5, usuario.getTelefone());
+            ps.setString(6, usuario.getPerfil().name());
+            ps.setBoolean(7, usuario.isAdministrador());
+            ps.setString(8, matriculaOriginal);
             ps.executeUpdate();
         }
         return true;

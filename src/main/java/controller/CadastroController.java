@@ -32,12 +32,17 @@ public class CadastroController {
         }
     }
 
-    public int editarUsuario(String nome, String email, String matricula,
-            String telefone, Perfil perfil, boolean administrador) {
-        Usuario usuario = new Usuario(nome, email, "", matricula, "", telefone, perfil, administrador);
+    public int editarUsuario(String nome, String email, String novaMatricula, String novoCpf,
+            String telefone, Perfil perfil, boolean administrador, String matriculaOriginal) {
+        
+        Usuario usuarioAtual = buscarUsuario(matriculaOriginal);
+        String senhaAtual = usuarioAtual != null ? usuarioAtual.getSenha() : "";
+        
+        Usuario usuario = new Usuario(nome, email, senhaAtual, novaMatricula, novoCpf, telefone, perfil, administrador);
         try {
-            return repository.atualizar(usuario) ? 1 : 0;
+            return repository.atualizar(usuario, matriculaOriginal) ? 1 : 0;
         } catch (SQLException e) {
+            if (e.getErrorCode() == 1062) return 2;
             e.printStackTrace();
             return 3;
         }

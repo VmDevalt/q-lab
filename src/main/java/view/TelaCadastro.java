@@ -38,6 +38,7 @@ public class TelaCadastro extends JFrame {
     private Boolean senhaVisivel = false;
 
     private Usuario usuarioEncontrado;
+    private String matriculaOriginal; 
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
@@ -52,6 +53,7 @@ public class TelaCadastro extends JFrame {
     public TelaCadastro() {
         this(false);
     }
+    
 
     /** Abre em modo edição com o usuário já carregado (vindo do popup de busca). */
     public TelaCadastro(Usuario usuario) {
@@ -312,7 +314,8 @@ public class TelaCadastro extends JFrame {
         campoMatricula.setText(u.getMatricula());
         campoCpf.setText(u.getCpf() != null ? u.getCpf() : "");
         campoTelefone.setText(u.getTelefone() != null ? u.getTelefone() : "");
-
+        this.matriculaOriginal = u.getMatricula();
+        
         switch (u.getPerfil()) {
             case PROFESSOR: comboBox.setSelectedIndex(1); break;
             case TECNICO: comboBox.setSelectedIndex(2); break;
@@ -331,8 +334,8 @@ public class TelaCadastro extends JFrame {
         comboBox.setEnabled(habilitar);
         checkBoxAdministrador.setEnabled(habilitar);
         chkAtivo.setEnabled(habilitar);
-        campoCpf.setEnabled(false);
-        campoMatricula.setEnabled(false);
+        campoCpf.setEnabled(habilitar);
+        campoMatricula.setEnabled(habilitar);
     }
 
     private void salvarEdicao() {
@@ -344,6 +347,8 @@ public class TelaCadastro extends JFrame {
         String nome = campoNome.getText().trim();
         String email = campoEmail.getText().trim();
         String telefone = campoTelefone.getText();
+        String matricula = campoMatricula.getText();
+        String cpf = campoCpf.getText();
 
         if (nome.isEmpty() || nome.equals("Digite seu nome")) {
             destacarBorda(campoNome);
@@ -371,8 +376,35 @@ public class TelaCadastro extends JFrame {
         boolean administrador = (perfilSelecionado == Perfil.PROFESSOR || perfilSelecionado == Perfil.TECNICO)
                 && checkBoxAdministrador.isSelected();
 
+        if (perfilSelecionado == Perfil.PROFESSOR || perfilSelecionado == Perfil.TECNICO) {
+            if (!campoMatricula.getText().matches("\\d{7,8}")) {
+                destacarBorda(campoMatricula);
+                JOptionPane.showMessageDialog(null, "Matrícula inválida! Use 7 ou 8 dígitos numéricos.", "Erro", JOptionPane.ERROR_MESSAGE);
+                return;
+            } else { restaurarBorda(campoMatricula); }
+        } else if (perfilSelecionado == Perfil.ESTUDANTE_GUARDIAO) {
+            if (!campoMatricula.getText().toUpperCase().matches("\\d{5}[A-Z]{5}\\d{4}")) {
+                destacarBorda(campoMatricula);
+                JOptionPane.showMessageDialog(null, "Matrícula inválida! Use o formato: 202XXADSPLXXXX", "Erro", JOptionPane.ERROR_MESSAGE);
+                return;
+            } else { restaurarBorda(campoMatricula); }
+        }
+        
+        if (cpf.contains("_") || cpf.replace(".", "").replace("-", "").isBlank()) {
+            destacarBorda(campoCpf);
+            JOptionPane.showMessageDialog(null, "CPF inválido ou incompleto!");
+            return;
+        } else { restaurarBorda(campoCpf); }
+
+        if (!cpf.matches("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}")) {
+            destacarBorda(campoCpf);
+            JOptionPane.showMessageDialog(null, "CPF deve estar no formato 000.000.000-00!");
+            return;
+        } else { restaurarBorda(campoCpf); }
+
+        
         CadastroController controller = new CadastroController();
-        int resultado = controller.editarUsuario(nome, email, usuarioEncontrado.getMatricula(), telefone, perfilSelecionado, administrador);
+        int resultado = controller.editarUsuario(nome, email, matricula, cpf, telefone, perfilSelecionado, administrador, matriculaOriginal);
 
         if (resultado != 1) {
             JOptionPane.showMessageDialog(this, "Erro ao atualizar usuário.", "Erro", JOptionPane.ERROR_MESSAGE);

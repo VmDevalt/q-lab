@@ -29,8 +29,8 @@ public class UsuarioRepository {
         return dao.save(usuario);
     }
 
-    public boolean atualizar(Usuario usuario) throws SQLException {
-        return dao.update(usuario);
+    public boolean atualizar(Usuario usuario, String matriculaOriginal) throws SQLException {
+        return dao.update(usuario, matriculaOriginal);
     }
 
     public boolean desativar(String matricula) throws SQLException {
