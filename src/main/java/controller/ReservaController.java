@@ -60,6 +60,16 @@ public class ReservaController {
         }
     }
 
+    public String editarReserva(int idReserva, String novaDisciplina) {
+        try {
+            reservaRepo.atualizar(idReserva, novaDisciplina);
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "Erro ao editar reserva: " + e.getMessage();
+        }
+    }
+
     public List<Reserva> listarReservasAtivas(String matricula) {
         try {
             return reservaRepo.buscarPorMatricula(matricula);
