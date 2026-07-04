@@ -88,7 +88,7 @@ public class ReservaDao {
     }
 
     public List<Reserva> findByLaboratorioEData(int laboratorioId, Date data) throws SQLException {
-        String sql = buildJoinQuery("h.laboratorio_id = ? AND h.dia = ? AND r.status = 'AGENDADA'");
+        String sql = buildJoinQuery("h.laboratorio_id = ? AND h.dia = ? AND r.status IN ('AGENDADA', 'SOLICITADA')");
         List<Reserva> lista = new ArrayList<>();
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

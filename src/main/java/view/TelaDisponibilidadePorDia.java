@@ -52,6 +52,7 @@ import model.Laboratorio;
 import model.Perfil;
 import model.Reserva;
 import model.StatusLab;
+import model.StatusReserva;
 import model.Usuario;
 import util.ImageUtil;
 
@@ -234,7 +235,7 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		JButton btnPedidos = criarBotaoMenu("Pedidos de Reserva");
 		btnPedidos.setBounds(4, 615, 170, 32);
 		btnPedidos.addActionListener(e -> cardLayout.show(painelConteudo, "PEDIDOS"));
-		btnPedidos.setVisible(isAdmin);
+		btnPedidos.setVisible(isAdmin || usuarioLogado.getPerfil() == Perfil.PROFESSOR);
 		painelNav.add(btnPedidos);
 
 		painelNav.setPreferredSize(new Dimension(175, 665));
@@ -299,7 +300,7 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		painel.add(lblTabTitulo);
 
 		DefaultTableModel reservaModel = new DefaultTableModel(
-				new String[]{"Lab", "Horário", "Período", "Guardião", "Motivo", "Aceitar", "Recusar"}, 0) {
+				new String[]{"Lab", "Horário", "Período", "Guardião", "Motivo"}, 0) {
 			private static final long serialVersionUID = 1L;
 			@Override public boolean isCellEditable(int r, int c) { return false; }
 		};
@@ -309,24 +310,137 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		reservaTable.setFont(new Font("Calibri", Font.PLAIN, 13));
 		reservaTable.getTableHeader().setFont(new Font("Calibri", Font.BOLD, 13));
 		reservaTable.getTableHeader().setReorderingAllowed(false);
-		reservaTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-			private static final long serialVersionUID = 1L;
-			@Override public Component getTableCellRendererComponent(
-					JTable t, Object v, boolean sel, boolean foc, int r, int c) {
-				super.getTableCellRendererComponent(t, v, sel, foc, r, c);
-				setHorizontalAlignment(SwingConstants.CENTER);
-				setBackground(r % 2 == 0 ? Color.WHITE : new Color(245, 250, 245));
-				setForeground(Color.DARK_GRAY);
-				return this;
-			}
-		});
+		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
+		    private static final long serialVersionUID = 1L;
 
+		    @Override
+		    public Component getTableCellRendererComponent(
+		            JTable table, Object value, boolean isSelected,
+		            boolean hasFocus, int row, int column) {
+
+		        super.getTableCellRendererComponent(
+		                table, value, isSelected, hasFocus, row, column);
+
+		        setHorizontalAlignment(SwingConstants.CENTER);
+
+		        if (table.getSelectionModel().isSelectedIndex(row)) {
+		            setBackground(new Color(56, 142, 60));
+		            setForeground(Color.WHITE);
+		        } else {
+		            setBackground(row % 2 == 0 ? Color.WHITE : new Color(245, 250, 245));
+		            setForeground(Color.DARK_GRAY);
+		        }
+
+		        return this;
+		    }
+		};
+
+		reservaTable.setDefaultRenderer(Object.class, renderer);
+		reservaTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		reservaTable.setRowSelectionAllowed(true);
+		reservaTable.setColumnSelectionAllowed(false);
+		reservaTable.setCellSelectionEnabled(false);
+		reservaTable.setSelectionBackground(new Color(129, 199, 132));
+		reservaTable.setSelectionForeground(Color.BLACK);
+		reservaTable.setSurrendersFocusOnKeystroke(true);
+		
+		reservaTable.setShowGrid(true);
+		reservaTable.setFocusable(false);
+		
+		
+		List<Reserva> listaSolicitacoes = new ArrayList<>();	
+		
+		JButton btnAprovar = new JButton("Aprovar");
+		btnAprovar.setFont(new Font("Calibri", Font.BOLD, 13));
+		btnAprovar.setBackground(new Color(27, 94, 32));
+		btnAprovar.setForeground(Color.WHITE);
+		btnAprovar.setBounds(390, 560, 130, 35);
+		
+		painel.add(btnAprovar);
+
+		btnAprovar.addActionListener(e -> {
+			int[] linhas = reservaTable.getSelectedRows();
+
+			if (linhas.length == 0) {
+			    JOptionPane.showMessageDialog(null, "Selecione uma ou mais solicitações.");
+			    return;
+			}
+
+			for (int linha : linhas) {
+			    Reserva reserva = listaSolicitacoes.get(linha);
+			    reservaCtrl.aprovarReserva(reserva.getIdReserva());
+			}
+
+			JOptionPane.showMessageDialog(null, "Reservas aprovadas com sucesso!");
+
+			carregarSolicitacoes(reservaModel, listaSolicitacoes);
+		});
+		
+		JButton btnRecusar = new JButton("Recusar");
+		btnRecusar.setFont(new Font("Calibri", Font.BOLD, 13));
+		btnRecusar.setBackground(new Color(183, 28, 28));
+		btnRecusar.setForeground(Color.WHITE);
+		btnRecusar.setBounds(540, 560, 130, 35);
+		painel.add(btnRecusar);
+		
+		btnRecusar.addActionListener(e -> {
+		    int[] linhas = reservaTable.getSelectedRows();
+
+		    if (linhas.length == 0) {
+			    JOptionPane.showMessageDialog(null, "Selecione uma ou mais solicitações.");
+			    return;
+			}
+
+			for (int linha : linhas) {
+			    Reserva reserva = listaSolicitacoes.get(linha);
+			    reservaCtrl.cancelarReserva(reserva.getIdReserva());
+			}
+
+		    JOptionPane.showMessageDialog(null, "Reserva recusada!");
+
+		    carregarSolicitacoes(reservaModel, listaSolicitacoes); 
+		});
+		
 		JScrollPane scroll = new JScrollPane(reservaTable);
 		scroll.setBounds(28, 120, 1006, 420);
 		painel.add(scroll);
+			
+
+		painel.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentShown(ComponentEvent e) {
+			    carregarSolicitacoes(reservaModel, listaSolicitacoes);
+			}
+		});
+
 		
 		return painel;
 	};
+	
+	private void carregarSolicitacoes(DefaultTableModel reservaModel,
+										List<Reserva> listaSolicitacoes) {
+		reservaModel.setRowCount(0);
+		listaSolicitacoes.clear();
+
+		if (usuarioLogado == null) return;
+		
+		List<Reserva> solicitacoes =
+		reservaCtrl.buscarSolicitacoesByResponsavel(usuarioLogado.getMatricula());
+		
+		for (Reserva r : solicitacoes) {
+			listaSolicitacoes.add(r);
+		
+			HorariosEnum slot = r.getHorario().getHorario();
+			
+			reservaModel.addRow(new Object[]{
+				r.getHorario().getLaboratorio().getNome(),
+				slot.name(),
+				slot.getHi() + " – " + slot.getHf(),
+				r.getMatricula(),
+				r.getDisciplina()
+		});
+		}
+}
 	
 
 	private JPanel criarPainelGridLabs(List<Laboratorio> labs, String[] cardKeys) {
@@ -674,11 +788,14 @@ public class TelaDisponibilidadePorDia extends JFrame {
 					disponibilidade[slotIdx][labIdx] = StatusLab.INTERDITADO;
 					val = "<html><center><b>Interditado</b></center></html>";
 				} else if (mapaReservas.containsKey(slots[slotIdx])) {
-					disponibilidade[slotIdx][labIdx] = StatusLab.OCUPADO;
 					Reserva r = mapaReservas.get(slots[slotIdx]);
-					Usuario u = buscarUsuario(r.getMatricula());
-					String nome = u != null ? primeiroNome(u.getNome()) : r.getMatricula();
-					val = "<html><center><b>OCUPADO</b><br>" + nome + "</center></html>";
+					if (r.getStatus() == StatusReserva.SOLICITADA) {
+				        disponibilidade[slotIdx][labIdx] = StatusLab.SOLICITADO;
+				        val = "<html><center><b>SOLICITADO</b><br>...</center></html>";
+				    } else {
+				        disponibilidade[slotIdx][labIdx] = StatusLab.OCUPADO;
+				        val = "<html><center><b>OCUPADO</b><br>...</center></html>";
+				    }
 				} else {
 					disponibilidade[slotIdx][labIdx] = StatusLab.LIVRE;
 					val = "";
@@ -1092,15 +1209,30 @@ public class TelaDisponibilidadePorDia extends JFrame {
 			for (int[] sel : selecionados) horariosSelec.add(HorariosEnum.values()[sel[0]]);
 			String disciplina = abrirDialogReserva(lab, horariosSelec);
 			if (disciplina == null) return;
-
+			String responsavelMatricula = null;
+			if (usuarioLogado.getPerfil() == Perfil.ESTUDANTE_GUARDIAO) {
+			    responsavelMatricula = JOptionPane.showInputDialog("Matrícula do professor responsável:");
+			    if (responsavelMatricula == null || responsavelMatricula.trim().isEmpty()) return;
+			}
+			
 			List<String> erros = new ArrayList<>();
 			for (int[] sel : selecionados) {
-				String erro = reservaCtrl.realizarReserva(dataAtual, slots[sel[0]], lab.getId(),
-						usuarioLogado.getMatricula(), disciplina.trim());
+				String erro = null;
+			    if (usuarioLogado.getPerfil() == Perfil.ESTUDANTE_GUARDIAO) {
+			        erro = reservaCtrl.solicitarReserva(dataAtual, slots[sel[0]], lab.getId(),
+			                usuarioLogado.getMatricula(), disciplina.trim(), responsavelMatricula);
+			    } else {
+			        erro = reservaCtrl.realizarReserva(dataAtual, slots[sel[0]], lab.getId(),
+			                usuarioLogado.getMatricula(), disciplina.trim());
+			    }
+
 				if (erro != null) erros.add(slots[sel[0]].name() + ": " + erro);
 			}
 			if (erros.isEmpty()) {
-				JOptionPane.showMessageDialog(this, selecionados.size() + " horário(s) reservado(s) com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+				String msgSucesso = usuarioLogado.getPerfil() == Perfil.ESTUDANTE_GUARDIAO
+					    ? selecionados.size() + " horário(s) solicitado(s) com sucesso!"
+					    : selecionados.size() + " horário(s) reservado(s) com sucesso!";
+					JOptionPane.showMessageDialog(this, msgSucesso, "Sucesso", JOptionPane.INFORMATION_MESSAGE);
 			} else {
 				JOptionPane.showMessageDialog(this, "Erros:\n" + String.join("\n", erros), "Aviso", JOptionPane.WARNING_MESSAGE);
 			}
@@ -1619,6 +1751,7 @@ private void abrirDialogoReativar(Laboratorio lab, Date hoje) {
 					case "OCUPADO"     -> { setBackground(new Color(255, 82, 82)); setForeground(Color.WHITE); }
 					case "INTERDITADO" -> { setBackground(new Color(180, 180, 180)); setForeground(Color.DARK_GRAY); }
 					case "LIVRE"       -> { setBackground(new Color(126, 217, 87)); setForeground(Color.DARK_GRAY); }
+					case "SOLICITADO"  -> { setBackground(new Color (190, 255, 162));setForeground(Color.DARK_GRAY); }
 					default            -> { setBackground(Color.WHITE); setForeground(Color.GRAY); }
 				}
 				return this;
@@ -1728,10 +1861,22 @@ private void abrirDialogoReativar(Laboratorio lab, Date hoje) {
 				String disciplina = abrirDialogReserva(lab, horariosSelec);
 				if (disciplina == null) return;
 				List<String> erros = new ArrayList<>();
+				String responsavelMatricula = null;
+				if (usuarioLogado.getPerfil() == Perfil.ESTUDANTE_GUARDIAO) {
+				    responsavelMatricula = JOptionPane.showInputDialog("Matrícula do professor responsável:");
+				    if (responsavelMatricula == null || responsavelMatricula.trim().isEmpty()) return;
+				}
+
 				for (int idx : sorted) {
-					String erro = reservaCtrl.realizarReserva(dataAtual, slots[idx], lab.getId(),
-							usuarioLogado.getMatricula(), disciplina.trim());
-					if (erro != null) erros.add(slots[idx].name() + ": " + erro);
+				    String erro = null;
+				    if (usuarioLogado.getPerfil() == Perfil.ESTUDANTE_GUARDIAO) {
+				        erro = reservaCtrl.solicitarReserva(dataAtual, slots[idx], lab.getId(),
+				                usuarioLogado.getMatricula(), disciplina.trim(), responsavelMatricula);
+				    } else {
+				        erro = reservaCtrl.realizarReserva(dataAtual, slots[idx], lab.getId(),
+				                usuarioLogado.getMatricula(), disciplina.trim());
+				    }
+				    if (erro != null) erros.add(slots[idx].name() + ": " + erro);
 				}
 				if (erros.isEmpty()) {
 					JOptionPane.showMessageDialog(painel, sorted.size() + " horário(s) reservado(s) com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
@@ -1810,11 +1955,15 @@ private void abrirDialogoReativar(Laboratorio lab, Date hoje) {
 				model.setValueAt("INTERDITADO", i, 1);
 				model.setValueAt("—", i, 2);
 			} else if (mapa.containsKey(slots[i])) {
-				Reserva r = mapa.get(slots[i]);
-				model.setValueAt("OCUPADO", i, 1);
-				Usuario u = buscarUsuario(r.getMatricula());
-				String nomeCompleto = u != null ? u.getNome() : r.getMatricula();
-				model.setValueAt(nomeCompleto + " – " + r.getDisciplina(), i, 2);
+			    Reserva r = mapa.get(slots[i]);
+			    if (r.getStatus() == StatusReserva.SOLICITADA) {
+			        model.setValueAt("SOLICITADO", i, 1);
+			    } else {
+			        model.setValueAt("OCUPADO", i, 1);
+			    }
+			    Usuario u = buscarUsuario(r.getMatricula());
+			    String nomeCompleto = u != null ? u.getNome() : r.getMatricula();
+			    model.setValueAt(nomeCompleto + " – " + r.getDisciplina(), i, 2);
 			} else {
 				model.setValueAt("LIVRE", i, 1);
 				model.setValueAt("—", i, 2);
@@ -1860,6 +2009,9 @@ private void abrirDialogoReativar(Laboratorio lab, Date hoje) {
 			} else if (status == StatusLab.INTERDITADO) {
 				setBackground(new Color(180, 180, 180));
 				setForeground(Color.DARK_GRAY);
+			} else if (status == StatusLab.SOLICITADO) {
+			    setBackground(new Color(190, 255, 162));
+			    setForeground(Color.DARK_GRAY);
 			} else {
 				setBackground(new Color(126, 217, 87));
 				setForeground(Color.DARK_GRAY);
