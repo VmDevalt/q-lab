@@ -94,6 +94,16 @@ public class ReservaDao {
         }
     }
 
+    public void atualizar(int idReserva, String novaDisciplina) throws SQLException {
+        String sql = "UPDATE reservas SET disciplina = ? WHERE id_reserva = ?";
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, novaDisciplina);
+            ps.setInt(2, idReserva);
+            ps.executeUpdate();
+        }
+    }
+
     private String buildJoinQuery(String whereClause) {
         return """
             SELECT r.id_reserva, r.matricula, r.disciplina, r.status,

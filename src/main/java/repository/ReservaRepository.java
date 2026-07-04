@@ -34,4 +34,8 @@ public class ReservaRepository {
     public void cancelar(int idReserva) throws SQLException {
         dao.cancelar(idReserva);
     }
+
+    public void atualizar(int idReserva, String novaDisciplina) throws SQLException {
+        dao.atualizar(idReserva, novaDisciplina);
+    }
 }

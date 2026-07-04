@@ -16,6 +16,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -33,6 +34,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JScrollPane;
+import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
@@ -71,6 +73,7 @@ public class TelaDisponibilidadePorDia extends JFrame {
 	private StatusLab[][] disponibilidade;
 	private List<Laboratorio> laboratorios;
 	private DefaultTableModel tabelaHorarios;
+	private final Map<String, Runnable> labRefreshers = new HashMap<>();
 
 	private final LaboratorioController labCtrl = new LaboratorioController();
 	private final ReservaController reservaCtrl = new ReservaController();
@@ -133,86 +136,85 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		painelNav.setLayout(null);
 		painelNav.setBackground(new Color(27, 94, 32));
 
-		JLabel lblLabs = new JLabel("LABORATÓRIOS");
-		lblLabs.setFont(new Font("Calibri", Font.BOLD, 10));
-		lblLabs.setForeground(new Color(165, 214, 167));
-		lblLabs.setBounds(12, 8, 160, 14);
-		painelNav.add(lblLabs);
-
-		JButton btnLab01 = criarBotaoMenu("Lab 01", "Redes e Manutenção");
-		btnLab01.setBounds(4, 26, 170, 46);
-		btnLab01.addActionListener(e -> cardLayout.show(painelConteudo, "LAB01"));
-		painelNav.add(btnLab01);
-
-		JButton btnLab02 = criarBotaoMenu("Lab 02", "Informática");
-		btnLab02.setBounds(4, 78, 170, 46);
-		btnLab02.addActionListener(e -> cardLayout.show(painelConteudo, "LAB02"));
-		painelNav.add(btnLab02);
-
-		JButton btnLab03 = criarBotaoMenu("Lab 03", "Desenvolvimento");
-		btnLab03.setBounds(4, 130, 170, 46);
-		btnLab03.addActionListener(e -> cardLayout.show(painelConteudo, "LAB03"));
-		painelNav.add(btnLab03);
-
-		JButton btnLab05 = criarBotaoMenu("Lab 05", "Diretório ADS");
-		btnLab05.setBounds(4, 182, 170, 46);
-		btnLab05.addActionListener(e -> cardLayout.show(painelConteudo, "LAB05"));
-		painelNav.add(btnLab05);
-
-		JButton btnLab06 = criarBotaoMenu("Lab 06", "Prática de IA");
-		btnLab06.setBounds(4, 234, 170, 46);
-		btnLab06.addActionListener(e -> cardLayout.show(painelConteudo, "LAB06"));
-		painelNav.add(btnLab06);
-
-		JButton btnLab07 = criarBotaoMenu("Lab 07", "Informática 2");
-		btnLab07.setBounds(4, 286, 170, 46);
-		btnLab07.addActionListener(e -> cardLayout.show(painelConteudo, "LAB07"));
-		painelNav.add(btnLab07);
-
 		JLabel lblGeral = new JLabel("GERAL");
 		lblGeral.setFont(new Font("Calibri", Font.BOLD, 10));
 		lblGeral.setForeground(new Color(165, 214, 167));
-		lblGeral.setBounds(12, 345, 160, 14);
+		lblGeral.setBounds(12, 8, 160, 14);
 		painelNav.add(lblGeral);
 
 		JButton btnInicio = criarBotaoMenu("Início");
-		btnInicio.setBounds(4, 363, 170, 32);
+		btnInicio.setBounds(4, 26, 170, 32);
 		btnInicio.addActionListener(e -> cardLayout.show(painelConteudo, "LABS"));
 		painelNav.add(btnInicio);
 
 		JButton btnDisponibilidade = criarBotaoMenu("Disponibilidade");
-		btnDisponibilidade.setBounds(4, 401, 170, 32);
+		btnDisponibilidade.setBounds(4, 64, 170, 32);
 		btnDisponibilidade.addActionListener(e -> cardLayout.show(painelConteudo, "TABELA"));
 		painelNav.add(btnDisponibilidade);
+
+		JLabel lblLabs = new JLabel("LABORATÓRIOS");
+		lblLabs.setFont(new Font("Calibri", Font.BOLD, 10));
+		lblLabs.setForeground(new Color(165, 214, 167));
+		lblLabs.setBounds(12, 108, 160, 14);
+		painelNav.add(lblLabs);
+
+		JButton btnLab01 = criarBotaoMenu("Lab 01", "Redes e Manutenção");
+		btnLab01.setBounds(4, 126, 170, 46);
+		btnLab01.addActionListener(e -> cardLayout.show(painelConteudo, "LAB01"));
+		painelNav.add(btnLab01);
+
+		JButton btnLab02 = criarBotaoMenu("Lab 02", "Informática");
+		btnLab02.setBounds(4, 178, 170, 46);
+		btnLab02.addActionListener(e -> cardLayout.show(painelConteudo, "LAB02"));
+		painelNav.add(btnLab02);
+
+		JButton btnLab03 = criarBotaoMenu("Lab 03", "Desenvolvimento");
+		btnLab03.setBounds(4, 230, 170, 46);
+		btnLab03.addActionListener(e -> cardLayout.show(painelConteudo, "LAB03"));
+		painelNav.add(btnLab03);
+
+		JButton btnLab05 = criarBotaoMenu("Lab 05", "Diretório ADS");
+		btnLab05.setBounds(4, 282, 170, 46);
+		btnLab05.addActionListener(e -> cardLayout.show(painelConteudo, "LAB05"));
+		painelNav.add(btnLab05);
+
+		JButton btnLab06 = criarBotaoMenu("Lab 06", "Prática de IA");
+		btnLab06.setBounds(4, 334, 170, 46);
+		btnLab06.addActionListener(e -> cardLayout.show(painelConteudo, "LAB06"));
+		painelNav.add(btnLab06);
+
+		JButton btnLab07 = criarBotaoMenu("Lab 07", "Informática 2");
+		btnLab07.setBounds(4, 386, 170, 46);
+		btnLab07.addActionListener(e -> cardLayout.show(painelConteudo, "LAB07"));
+		painelNav.add(btnLab07);
 
 		JLabel lblAdmin = new JLabel("ADMINISTRAÇÃO");
 		lblAdmin.setFont(new Font("Calibri", Font.BOLD, 10));
 		lblAdmin.setForeground(new Color(165, 214, 167));
-		lblAdmin.setBounds(12, 449, 160, 14);
+		lblAdmin.setBounds(12, 445, 160, 14);
 		lblAdmin.setVisible(isAdmin);
 		painelNav.add(lblAdmin);
 
-
 		JButton btnDashboard = criarBotaoMenu("Dashboard");
-		btnDashboard.setBounds(4, 467, 170, 32);
+		btnDashboard.setBounds(4, 463, 170, 32);
 		btnDashboard.addActionListener(e -> cardLayout.show(painelConteudo, "DASHBOARD"));
 		btnDashboard.setVisible(isAdmin);
 		painelNav.add(btnDashboard);
 
 		JButton btnCadastrar = criarBotaoMenu("Cadastrar");
-		btnCadastrar.setBounds(4, 505, 170, 32);
+		btnCadastrar.setBounds(4, 501, 170, 32);
 		btnCadastrar.addActionListener(e -> new TelaCadastro().setVisible(true));
 		btnCadastrar.setVisible(isAdmin);
 		painelNav.add(btnCadastrar);
 
 		JButton btnInterditar = criarBotaoMenu("Interditar");
-		btnInterditar.setBounds(4, 543, 170, 32);
+		btnInterditar.setBounds(4, 539, 170, 32);
 		btnInterditar.addActionListener(e -> cardLayout.show(painelConteudo, "INTERDITAR"));
 		btnInterditar.setVisible(isAdmin);
 		painelNav.add(btnInterditar);
 
 		JButton btnEditarUsuario = criarBotaoMenu("Editar Usuário");
-		btnEditarUsuario.setBounds(4, 581, 170, 32);
+		btnEditarUsuario.setBounds(4, 577, 170, 32);
 		btnEditarUsuario.addActionListener(e -> {
 			String matricula = JOptionPane.showInputDialog(this,
 					"Informe a matrícula do usuário:", "Editar Usuário", JOptionPane.PLAIN_MESSAGE);
@@ -229,7 +231,7 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		painelNav.add(btnEditarUsuario);
 
 		JButton btnPedidos = criarBotaoMenu("Pedidos de Reserva");
-		btnPedidos.setBounds(4, 619, 170, 32);
+		btnPedidos.setBounds(4, 615, 170, 32);
 		btnPedidos.addActionListener(e -> cardLayout.show(painelConteudo, "PEDIDOS"));
 		btnPedidos.setVisible(isAdmin);
 		painelNav.add(btnPedidos);
@@ -670,22 +672,50 @@ public class TelaDisponibilidadePorDia extends JFrame {
 	}
 
 	private void mostrarPopupCelula(Laboratorio lab, HorariosEnum slot, StatusLab status) {
-		JDialog dialog = new JDialog(this, "Detalhes do Horário", true);
-		dialog.setSize(360, 280);
-		dialog.setLocationRelativeTo(this);
-		dialog.setResizable(false);
-		dialog.setLayout(null);
+		if (status == StatusLab.OCUPADO) {
+			List<Reserva> reservas = reservaCtrl.reservasPorLabEData(lab.getId(), dataAtual);
+			Reserva reservaClicada = null;
+			for (Reserva r : reservas) {
+				if (r.getHorario().getHorario() == slot) {
+					reservaClicada = r;
+					break;
+				}
+			}
+			if (reservaClicada != null) {
+				final Reserva r = reservaClicada;
+				List<Reserva> grupoReservas = new ArrayList<>();
+				for (Reserva x : reservas) {
+					if (x.getMatricula().equals(r.getMatricula())
+							&& x.getDisciplina().equals(r.getDisciplina())) {
+						grupoReservas.add(x);
+					}
+				}
+				grupoReservas.sort(Comparator.comparingInt(x -> x.getHorario().getHorario().ordinal()));
+				List<HorariosEnum> todosSlots = new ArrayList<>();
+				for (Reserva x : grupoReservas) todosSlots.add(x.getHorario().getHorario());
+				Usuario u = buscarUsuario(r.getMatricula());
+				boolean podeEditar = isAdmin || r.getMatricula().equals(
+						usuarioLogado != null ? usuarioLogado.getMatricula() : "");
+				new ModalDetalhamento(this, r, lab, todosSlots, dataAtual, u, podeEditar,
+						() -> mostrarDialogEditar(lab, todosSlots, grupoReservas)).setVisible(true);
+				return;
+			}
+		}
 
 		Color corStatus = switch (status) {
-			case OCUPADO -> new Color(255, 82, 82);
 			case INTERDITADO -> new Color(180, 180, 180);
 			default -> new Color(126, 217, 87);
 		};
 		String textoStatus = switch (status) {
-			case OCUPADO -> "OCUPADO";
 			case INTERDITADO -> "INTERDITADO";
 			default -> "LIVRE";
 		};
+
+		JDialog dialog = new JDialog(this, "Detalhes do Horário", true);
+		dialog.setSize(360, 200);
+		dialog.setLocationRelativeTo(this);
+		dialog.setResizable(false);
+		dialog.setLayout(null);
 
 		JPanel faixa = new JPanel(null);
 		faixa.setBounds(0, 0, 360, 8);
@@ -709,44 +739,208 @@ public class TelaDisponibilidadePorDia extends JFrame {
 		lblStatus.setBounds(20, 74, 320, 20);
 		dialog.add(lblStatus);
 
-		if (status == StatusLab.OCUPADO) {
-			List<Reserva> reservas = reservaCtrl.reservasPorLabEData(lab.getId(), dataAtual);
-			for (Reserva r : reservas) {
-				if (r.getHorario().getHorario() == slot) {
-					JLabel lblMatricula = new JLabel("Matrícula: " + r.getMatricula());
-					lblMatricula.setFont(new Font("Calibri", Font.PLAIN, 13));
-					lblMatricula.setBounds(20, 104, 320, 18);
-					dialog.add(lblMatricula);
-
-					JLabel lblDisciplina = new JLabel("Disciplina: " + r.getDisciplina());
-					lblDisciplina.setFont(new Font("Calibri", Font.PLAIN, 13));
-					lblDisciplina.setBounds(20, 126, 320, 18);
-					dialog.add(lblDisciplina);
-					break;
-				}
-			}
-		}
-
 		JSeparator sep = new JSeparator();
-		sep.setBounds(0, 200, 360, 2);
+		sep.setBounds(0, 118, 360, 2);
 		dialog.add(sep);
-
-		JButton btnEditar = new JButton("Editar");
-		btnEditar.setFont(new Font("Calibri", Font.BOLD, 13));
-		btnEditar.setBackground(new Color(27, 94, 32));
-		btnEditar.setForeground(Color.WHITE);
-		btnEditar.setFocusable(false);
-		btnEditar.setBounds(80, 215, 90, 32);
-		btnEditar.addActionListener(e -> dialog.dispose());
-		dialog.add(btnEditar);
 
 		JButton btnFechar = new JButton("Fechar");
 		btnFechar.setFont(new Font("Calibri", Font.PLAIN, 13));
 		btnFechar.setFocusable(false);
-		btnFechar.setBounds(185, 215, 90, 32);
+		btnFechar.setBounds(130, 133, 100, 32);
 		btnFechar.addActionListener(e -> dialog.dispose());
 		dialog.add(btnFechar);
 
+		dialog.setVisible(true);
+	}
+
+	private void mostrarDialogEditar(Laboratorio lab, List<HorariosEnum> todosSlots, List<Reserva> grupoReservas) {
+		final int W = 480;
+		final HorariosEnum[] allValues = HorariosEnum.values();
+		JDialog dialog = new JDialog(this, "Editar Reserva", true);
+		dialog.setLayout(null);
+		dialog.setResizable(false);
+
+		JPanel faixa = new JPanel();
+		faixa.setBounds(0, 0, W, 8);
+		faixa.setBackground(new Color(13, 71, 161));
+		dialog.add(faixa);
+
+		JLabel lblTitulo = new JLabel("Editar Reserva");
+		lblTitulo.setFont(new Font("Calibri", Font.BOLD, 20));
+		lblTitulo.setForeground(new Color(13, 71, 161));
+		lblTitulo.setBounds(30, 20, 400, 30);
+		dialog.add(lblTitulo);
+
+		int y = 65;
+
+		JLabel lblLabL = new JLabel("Laboratório:");
+		lblLabL.setFont(new Font("Calibri", Font.BOLD, 14));
+		lblLabL.setBounds(30, y, 130, 22);
+		dialog.add(lblLabL);
+		JLabel lblLabV = new JLabel(lab.getNome() + " – " + lab.getDescricao());
+		lblLabV.setFont(new Font("Calibri", Font.PLAIN, 14));
+		lblLabV.setBounds(165, y, 290, 22);
+		dialog.add(lblLabV);
+		y += 28;
+
+		JLabel lblDataL = new JLabel("Data:");
+		lblDataL.setFont(new Font("Calibri", Font.BOLD, 14));
+		lblDataL.setBounds(30, y, 130, 22);
+		dialog.add(lblDataL);
+		JLabel lblDataV = new JLabel(formatarData(dataAtual));
+		lblDataV.setFont(new Font("Calibri", Font.PLAIN, 14));
+		lblDataV.setBounds(165, y, 290, 22);
+		dialog.add(lblDataV);
+		y += 28;
+
+		JLabel lblAtualL = new JLabel(todosSlots.size() > 1 ? "Horários atuais:" : "Horário atual:");
+		lblAtualL.setFont(new Font("Calibri", Font.BOLD, 14));
+		lblAtualL.setBounds(30, y, 130, 22);
+		dialog.add(lblAtualL);
+		for (int i = 0; i < todosSlots.size(); i++) {
+			HorariosEnum s = todosSlots.get(i);
+			JLabel lbl = new JLabel(s.name() + "   " + s.getHi() + " – " + s.getHf());
+			lbl.setFont(new Font("Calibri", Font.PLAIN, 14));
+			lbl.setForeground(Color.DARK_GRAY);
+			lbl.setBounds(165, y, 290, 22);
+			dialog.add(lbl);
+			y += (i < todosSlots.size() - 1 ? 24 : 28);
+		}
+
+		String lblNovoTexto = todosSlots.size() > 1 ? "Novo início: *" : "Novo horário: *";
+		JLabel lblHorL = new JLabel(lblNovoTexto);
+		lblHorL.setFont(new Font("Calibri", Font.BOLD, 14));
+		lblHorL.setBounds(30, y, 130, 30);
+		dialog.add(lblHorL);
+
+		int maxStartOrd = allValues.length - todosSlots.size();
+		List<HorariosEnum> validStarts = new ArrayList<>();
+		for (HorariosEnum h : allValues) {
+			if (h.ordinal() <= maxStartOrd) validStarts.add(h);
+		}
+		JComboBox<HorariosEnum> comboSlot = new JComboBox<>(validStarts.toArray(new HorariosEnum[0]));
+		comboSlot.setSelectedItem(todosSlots.get(0));
+		comboSlot.setFont(new Font("Calibri", Font.PLAIN, 14));
+		comboSlot.setBounds(165, y, 280, 30);
+		comboSlot.setRenderer(new javax.swing.DefaultListCellRenderer() {
+			private static final long serialVersionUID = 1L;
+			@Override
+			public java.awt.Component getListCellRendererComponent(
+					javax.swing.JList<?> list, Object value, int index, boolean sel, boolean foc) {
+				super.getListCellRendererComponent(list, value, index, sel, foc);
+				if (value instanceof HorariosEnum h)
+					setText(h.name() + "   " + h.getHi() + " – " + h.getHf());
+				return this;
+			}
+		});
+		dialog.add(comboSlot);
+		y += 36;
+
+		if (todosSlots.size() > 1) {
+			JLabel lblInfo = new JLabel("Todos os horários serão deslocados proporcionalmente.");
+			lblInfo.setFont(new Font("Calibri", Font.ITALIC, 12));
+			lblInfo.setForeground(Color.GRAY);
+			lblInfo.setBounds(30, y, 430, 18);
+			dialog.add(lblInfo);
+			y += 24;
+		}
+
+		JSeparator sep = new JSeparator();
+		sep.setBounds(30, y, W - 60, 2);
+		dialog.add(sep);
+		y += 14;
+
+		JLabel lblDiscL = new JLabel("Disciplina: *");
+		lblDiscL.setFont(new Font("Calibri", Font.BOLD, 14));
+		lblDiscL.setBounds(30, y, 130, 30);
+		dialog.add(lblDiscL);
+
+		JTextField txtDisciplina = new JTextField(grupoReservas.get(0).getDisciplina());
+		txtDisciplina.setFont(new Font("Calibri", Font.PLAIN, 14));
+		txtDisciplina.setBounds(165, y, 280, 30);
+		dialog.add(txtDisciplina);
+		y += 52;
+
+		JButton btnCancelar = new JButton("Cancelar");
+		btnCancelar.setFont(new Font("Calibri", Font.PLAIN, 13));
+		btnCancelar.setFocusable(false);
+		btnCancelar.setBounds(W - 250, y, 100, 34);
+		btnCancelar.addActionListener(e -> dialog.dispose());
+		dialog.add(btnCancelar);
+
+		JButton btnSalvar = new JButton("Salvar");
+		btnSalvar.setFont(new Font("Calibri", Font.BOLD, 13));
+		btnSalvar.setBackground(new Color(13, 71, 161));
+		btnSalvar.setForeground(Color.WHITE);
+		btnSalvar.setFocusable(false);
+		btnSalvar.setBounds(W - 140, y, 110, 34);
+		btnSalvar.addActionListener(e -> {
+			String disc = txtDisciplina.getText().trim();
+			if (disc.isEmpty()) {
+				txtDisciplina.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+				return;
+			}
+			HorariosEnum novoStart = (HorariosEnum) comboSlot.getSelectedItem();
+			HorariosEnum velhoStart = todosSlots.get(0);
+			String erro = null;
+
+			if (novoStart == velhoStart) {
+				for (Reserva res : grupoReservas) {
+					erro = reservaCtrl.editarReserva(res.getIdReserva(), disc);
+					if (erro != null) break;
+				}
+			} else {
+				int offset = novoStart.ordinal() - velhoStart.ordinal();
+				List<HorariosEnum> novosSlots = new ArrayList<>();
+				for (HorariosEnum s : todosSlots) {
+					novosSlots.add(allValues[s.ordinal() + offset]);
+				}
+				List<Reserva> existentes = reservaCtrl.reservasPorLabEData(lab.getId(), dataAtual);
+				Set<Integer> idsGrupo = new HashSet<>();
+				for (Reserva res : grupoReservas) idsGrupo.add(res.getIdReserva());
+				Set<HorariosEnum> slotsOcupados = new HashSet<>();
+				for (Reserva x : existentes) {
+					if (!idsGrupo.contains(x.getIdReserva()))
+						slotsOcupados.add(x.getHorario().getHorario());
+				}
+				HorariosEnum conflito = null;
+				for (HorariosEnum ns : novosSlots) {
+					if (slotsOcupados.contains(ns)) { conflito = ns; break; }
+				}
+				if (conflito != null) {
+					JOptionPane.showMessageDialog(dialog,
+							"O horário " + conflito.name() + " já está ocupado neste laboratório.",
+							"Conflito", JOptionPane.WARNING_MESSAGE);
+					return;
+				}
+				for (Reserva res : grupoReservas) {
+					erro = reservaCtrl.cancelarReserva(res.getIdReserva());
+					if (erro != null) break;
+				}
+				if (erro == null) {
+					String matricula = grupoReservas.get(0).getMatricula();
+					for (HorariosEnum ns : novosSlots) {
+						erro = reservaCtrl.realizarReserva(dataAtual, ns, lab.getId(), matricula, disc);
+						if (erro != null) break;
+					}
+				}
+			}
+
+			if (erro != null) {
+				JOptionPane.showMessageDialog(dialog, erro, "Erro", JOptionPane.ERROR_MESSAGE);
+			} else {
+				dialog.dispose();
+				carregarDisponibilidade(dataAtual);
+				Runnable refreshLab = labRefreshers.get(lab.getNome().toUpperCase());
+				if (refreshLab != null) refreshLab.run();
+			}
+		});
+		dialog.add(btnSalvar);
+		dialog.getRootPane().setDefaultButton(btnSalvar);
+
+		y += 60;
+		dialog.setSize(W, y);
+		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
 	}
 
@@ -1546,6 +1740,8 @@ private void abrirDialogoReativar(Laboratorio lab, Date hoje) {
 				carregarPainelLab(lab, labModel, lblDataLab);
 			}
 		});
+
+		labRefreshers.put(lab.getNome().toUpperCase(), () -> carregarPainelLab(lab, labModel, lblDataLab));
 
 		return painel;
 	}
