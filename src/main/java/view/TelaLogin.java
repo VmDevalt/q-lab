@@ -101,7 +101,7 @@ public class TelaLogin extends JFrame {
 		JLabel labelCadastro = new JLabel("Login");
 		labelCadastro.setHorizontalAlignment(SwingConstants.CENTER);
 		labelCadastro.setFont(new Font("Calibri", Font.PLAIN, 50));
-		labelCadastro.setBounds(660, 114, 239, 70);
+		labelCadastro.setBounds(697, 121, 239, 70);
 		painelPrincipal.add(labelCadastro);
 
 		passwordField = new JPasswordField();
@@ -152,7 +152,7 @@ public class TelaLogin extends JFrame {
 			}
 		});
 		btnEntrar.setFont(new Font("Calibri", Font.PLAIN, 14));
-		btnEntrar.setBounds(628, 464, 124, 26);
+		btnEntrar.setBounds(757, 414, 124, 35);
 		btnEntrar.setForeground(new Color(255, 255, 255));
 		btnEntrar.setBackground(new Color(34, 139, 34));
 		painelPrincipal.add(btnEntrar);
@@ -173,15 +173,6 @@ public class TelaLogin extends JFrame {
 		labelImagemPredio.setBounds(269, 157, 349, 392);
 		painelPrincipal.add(labelImagemPredio);
 
-		JButton btnEsqueciSenha = new JButton("Esqueci a senha");
-		btnEsqueciSenha.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		btnEsqueciSenha.setFont(new Font("Calibri", Font.PLAIN, 14));
-		btnEsqueciSenha.setBounds(792, 464, 131, 26);
-		btnEsqueciSenha.setForeground(new Color(255, 255, 255));
-		btnEsqueciSenha.setBackground(new Color(34, 139, 34));
-		painelPrincipal.add(btnEsqueciSenha);
+		
 	}
 }

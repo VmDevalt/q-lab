@@ -3,13 +3,13 @@ USE qlab;
 
 CREATE TABLE IF NOT EXISTS usuarios (
     id          INT AUTO_INCREMENT PRIMARY KEY,
-    cpf         VARCHAR(14),
+    cpf         VARCHAR(14) Not NUll,
     nome        VARCHAR(80)  NOT NULL,
     matricula   VARCHAR(14)  NOT NULL UNIQUE,
     email       VARCHAR(50)  NOT NULL,
     telefone    VARCHAR(15)  NOT NULL,
     senha       VARCHAR(60)  NOT NULL,
-    perfil      ENUM('ADMINISTRADOR','PROFESSOR','TECNICO','ESTUDANTE_GUARDIAO'),
+    perfil      ENUM('PROFESSOR','TECNICO','ESTUDANTE_GUARDIAO'),
     administrador BOOLEAN    DEFAULT FALSE,
     ativo       BOOLEAN      DEFAULT TRUE,
     CHECK (email LIKE '%@%'),

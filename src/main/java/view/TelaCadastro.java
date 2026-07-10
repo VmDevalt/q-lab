@@ -148,7 +148,7 @@ public class TelaCadastro extends JFrame {
                 if (perfilSelecionado == Perfil.ESTUDANTE_GUARDIAO) {
                     JOptionPane.showMessageDialog(null, "A matrícula deve conter 5 números seguidos por 5 letras e 4 números. Ex: 202XXADSPLXXXX.");
                 } else {
-                    JOptionPane.showMessageDialog(null, "A matrícula deve conter 8 números. Ex: 11023456.");
+                    JOptionPane.showMessageDialog(null, "A matrícula deve conter 7-8 números. Ex: 11023456.");
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Selecione um perfil.");
@@ -503,6 +503,7 @@ public class TelaCadastro extends JFrame {
         if (sucesso == 1) {
             JOptionPane.showMessageDialog(TelaCadastro.this, "Cadastro realizado com sucesso!");
             dispose();
+            new TelaLogin().setVisible(true);
         } else if (sucesso == 2) {
             JOptionPane.showMessageDialog(TelaCadastro.this, "O usuário já está cadastrado.", "Erro", JOptionPane.ERROR_MESSAGE);
         } else {
