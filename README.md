@@ -1,10 +1,10 @@
-#Disciplina
+# Disciplina
 Análise e Projeto de Sistemas
 
-#Curso
+# Curso
 Análise e Desenvolvimento de Sistemas
 
-#Instituição
+# Instituição
 Instituto Federal de Pernambuco(IFPE)
 
 # QLAB
